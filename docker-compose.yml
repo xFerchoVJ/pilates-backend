@@ -1,0 +1,29 @@
+version: '3.9'
+services:
+  db:
+    image: postgres:15
+    container_name: pilates_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: pilates_dev
+    ports:
+      - "5433:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    
+  api:
+    build: .
+    environment:
+     - RAILS_MASTER_KEY=${RAILS_MASTER_KEY}
+    container_name: pilates_api
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -b 0.0.0.0 -p 3000"
+    volumes:
+      - .:/app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+
+volumes:
+  db_data:
