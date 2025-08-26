@@ -32,7 +32,7 @@ gem "bcrypt", "~> 3.1"
 gem "jwt", "~> 2.9"
 gem "rack-cors", "~> 2.0"
 gem 'google-id-token', '~> 1.4', '>= 1.4.2'
-gem 'dotenv-rails', '~> 2.1', '>= 2.1.1'
+gem 'dotenv-rails', '~> 3.1'
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
