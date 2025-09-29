@@ -33,6 +33,13 @@ gem "jwt", "~> 2.9"
 gem "rack-cors", "~> 2.0"
 gem 'google-id-token', '~> 1.4', '>= 1.4.2'
 gem 'dotenv-rails', '~> 2.1', '>= 2.1.1'
+gem 'pundit', '~> 2.5', '>= 2.5.2'
+gem 'sidekiq', '~> 7.0'
+gem 'sidekiq-cron', '~> 1.2'
+gem "redis", ">= 4.0.1"
+gem "cloudinary"
+gem "activestorage-cloudinary-service"
+
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem

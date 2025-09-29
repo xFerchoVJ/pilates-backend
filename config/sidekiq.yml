@@ -1,0 +1,10 @@
+:concurrency: 5
+:queues:
+  - default
+  - critical
+  - low
+
+:schedule:
+  cleanup_expired_tokens:
+    class: CleanupExpiredTokensJob
+    cron: '0 2 * * *' # Diariamente a las 2 AM

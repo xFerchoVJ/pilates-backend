@@ -12,6 +12,7 @@ class JwtService
   def self.encode(payload, exp:)
     payload = payload.dup
     payload[:exp] = exp.to_i
+    payload[:jti] = SecureRandom.uuid
     JWT.encode(payload, secret, ALGO)
   end
 

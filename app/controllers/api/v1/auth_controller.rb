@@ -60,11 +60,53 @@ class Api::V1::AuthController < ApplicationController
   end
 
   def logout
-    # opcional: revocar refresh recibido
+    # Blacklist el access_token actual si existe
+    if @current_user
+      header = request.headers["Authorization"]
+      token = header&.split("Bearer ")&.last
+      if token
+        decoded = JwtService.decode(token)
+        if decoded && decoded["jti"]
+          BlacklistedToken.blacklist!(decoded["jti"], Time.at(decoded["exp"]))
+        end
+      end
+    end
+
+    # Invalidar refresh_token si se proporciona
     if params[:refresh_token].present?
       RefreshTokenUser.find_by(jti: params[:refresh_token])&.update!(revoked_at: Time.current)
     end
-    head :no_content
+
+    render json: { message: "Logout exitoso" }
+  end
+
+  def logout_all
+    return render json: { error: "No autorizado" }, status: :unauthorized unless @current_user
+
+    # Invalidar todos los refresh tokens del usuario
+    RefreshTokenUser.where(user: @current_user).update_all(revoked_at: Time.current)
+    
+    # Blacklist el access_token actual
+    header = request.headers["Authorization"]
+    token = header&.split("Bearer ")&.last
+    if token
+      decoded = JwtService.decode(token)
+      if decoded && decoded["jti"]
+        BlacklistedToken.blacklist!(decoded["jti"], Time.at(decoded["exp"]))
+      end
+    end
+
+    render json: { message: "Logout de todos los dispositivos exitoso" }
+  end
+
+  def cleanup_tokens
+    return render json: { error: "No autorizado" }, status: :unauthorized unless @current_user
+    return render json: { error: "Solo administradores" }, status: :forbidden unless @current_user.admin?
+
+    # Programar job de limpieza
+    CleanupExpiredTokensJob.perform_async
+    
+    render json: { message: "Limpieza de tokens programada" }
   end
 
   private
@@ -83,14 +125,7 @@ class Api::V1::AuthController < ApplicationController
     )
 
     {
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        last_name: user.last_name,
-        phone: user.phone,
-        role: user.role
-      },
+      user: user.public_attributes,
       access_token: access_token,
       expires_in: JwtService.access_exp.to_i,
       refresh_token: refresh_jti
@@ -98,7 +133,7 @@ class Api::V1::AuthController < ApplicationController
   end
 
   def user_params
-    params.require(:user).permit(:email, :password, :name, :last_name, :phone, :role)
+    params.require(:user).permit(:email, :password, :name, :last_name, :phone, :role, :gender, :birthdate)
           .tap { |p| p[:email] = p[:email].to_s.downcase if p[:email] }
   end
 end

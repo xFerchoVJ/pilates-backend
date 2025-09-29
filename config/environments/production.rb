@@ -30,7 +30,7 @@ Rails.application.configure do
   # config.action_dispatch.x_sendfile_header = "X-Accel-Redirect" # for NGINX
 
   # Store uploaded files on the local file system (see config/storage.yml for options).
-  config.active_storage.service = :local
+  config.active_storage.service = :cloudinary
 
   # Mount Action Cable outside main process or domain.
   # config.action_cable.mount_path = nil
@@ -52,6 +52,13 @@ Rails.application.configure do
     .tap  { |logger| logger.formatter = ::Logger::Formatter.new }
     .then { |logger| ActiveSupport::TaggedLogging.new(logger) }
 
+  if ENV["RAILS_LOG_TO_STDOUT"].present?
+    logger           = ActiveSupport::Logger.new(STDOUT)
+    logger.formatter = config.log_formatter
+    config.logger    = ActiveSupport::TaggedLogging.new(logger)
+  end
+  
+
   # Prepend all log lines with the following tags.
   config.log_tags = [ :request_id ]
 
@@ -62,6 +69,20 @@ Rails.application.configure do
 
   # Use a different cache store in production.
   # config.cache_store = :mem_cache_store
+  config.cache_store = :redis_cache_store, {
+    url: ENV.fetch("REDIS_URL") { "redis://localhost:6379/0" }, # fallback a localhost
+    expires_in: 90.minutes
+  }
+
+  # Active Job con Sidekiq y Redis
+  config.active_job.queue_adapter = :sidekiq
+  Sidekiq.configure_server do |sidekiq_config|
+    sidekiq_config.redis = { url: ENV.fetch("REDIS_URL") { "redis://localhost:6379/0" } }
+  end
+  Sidekiq.configure_client do |sidekiq_config|
+    sidekiq_config.redis = { url: ENV.fetch("REDIS_URL") { "redis://localhost:6379/0" } }
+  end
+
 
   # Use a real queuing backend for Active Job (and separate queues per environment).
   # config.active_job.queue_adapter = :resque
@@ -69,7 +90,18 @@ Rails.application.configure do
 
   # Disable caching for Action Mailer templates even if Action Controller
   # caching is enabled.
+  # Mailer
+  config.action_mailer.raise_delivery_errors = true
   config.action_mailer.perform_caching = false
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+    address:              "smtp-relay.brevo.com",
+    port:                 587,
+    user_name:            ENV["BREVO_USERNAME"], # suele ser tu email
+    password:             ENV["BREVO_SMTP_KEY"],
+    authentication:       'plain',
+    enable_starttls_auto: true
+  }
 
   # Ignore bad email addresses and do not raise email delivery errors.
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
