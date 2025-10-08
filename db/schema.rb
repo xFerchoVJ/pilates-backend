@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_09_29_045120) do
+ActiveRecord::Schema[7.2].define(version: 2025_10_08_051305) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -50,6 +50,30 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_29_045120) do
     t.index ["jti"], name: "index_blacklisted_tokens_on_jti", unique: true
   end
 
+  create_table "class_sessions", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "description"
+    t.datetime "start_time", null: false
+    t.datetime "end_time", null: false
+    t.integer "capacity", null: false
+    t.bigint "instructor_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["instructor_id"], name: "index_class_sessions_on_instructor_id"
+  end
+
+  create_table "injuries", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "injury_type"
+    t.text "description"
+    t.string "severity"
+    t.date "date_ocurred"
+    t.boolean "recovered"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_injuries_on_user_id"
+  end
+
   create_table "refresh_token_users", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "jti"
@@ -61,6 +85,15 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_29_045120) do
     t.datetime "updated_at", null: false
     t.index ["jti"], name: "index_refresh_token_users_on_jti"
     t.index ["user_id"], name: "index_refresh_token_users_on_user_id"
+  end
+
+  create_table "reservations", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "class_session_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["class_session_id"], name: "index_reservations_on_class_session_id"
+    t.index ["user_id"], name: "index_reservations_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -84,5 +117,9 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_29_045120) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "class_sessions", "users", column: "instructor_id"
+  add_foreign_key "injuries", "users"
   add_foreign_key "refresh_token_users", "users"
+  add_foreign_key "reservations", "class_sessions"
+  add_foreign_key "reservations", "users"
 end

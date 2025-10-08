@@ -10,6 +10,13 @@ Rails.application.routes.draw do
       post "logout_all",    to: "auth#logout_all"    # logout de todos los dispositivos
       post "cleanup_tokens", to: "auth#cleanup_tokens" # limpiar tokens expirados (solo admin)
 
+      resources :reservations
+      resources :class_sessions
+      resources :injuries do
+        collection do
+          get :injuries_by_user
+        end
+      end
       resources :users do
         collection do
           post "send_password_reset"

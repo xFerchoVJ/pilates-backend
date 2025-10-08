@@ -39,6 +39,7 @@ gem 'sidekiq-cron', '~> 1.2'
 gem "redis", ">= 4.0.1"
 gem "cloudinary"
 gem "activestorage-cloudinary-service"
+gem 'pry', '~> 0.15.0'
 
 
 group :development, :test do
@@ -53,3 +54,6 @@ group :development, :test do
 end
 
 
+
+gem "active_model_serializers", "~> 0.10.15"
+gem "kaminari", "~> 1.2"

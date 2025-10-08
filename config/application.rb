@@ -41,5 +41,7 @@ module PilatesBackend
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
     config.active_job.queue_adapter = :sidekiq
+    config.time_zone = "America/Mexico_City"
+    config.active_record.default_timezone = :local
   end
 end

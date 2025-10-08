@@ -85,7 +85,7 @@ class Api::V1::AuthController < ApplicationController
 
     # Invalidar todos los refresh tokens del usuario
     RefreshTokenUser.where(user: @current_user).update_all(revoked_at: Time.current)
-    
+
     # Blacklist el access_token actual
     header = request.headers["Authorization"]
     token = header&.split("Bearer ")&.last
@@ -105,7 +105,7 @@ class Api::V1::AuthController < ApplicationController
 
     # Programar job de limpieza
     CleanupExpiredTokensJob.perform_async
-    
+
     render json: { message: "Limpieza de tokens programada" }
   end
 
@@ -125,7 +125,18 @@ class Api::V1::AuthController < ApplicationController
     )
 
     {
-      user: user.public_attributes,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        last_name: user.last_name,
+        phone: user.phone,
+        role: user.role,
+        gender: user.gender,
+        birthdate: user.birthdate,
+        profile_picture_url: user.profile_picture.attached? ? user.profile_picture.url : nil,
+        injuries: user.injuries
+      },
       access_token: access_token,
       expires_in: JwtService.access_exp.to_i,
       refresh_token: refresh_jti

@@ -1,7 +1,7 @@
 class User < ApplicationRecord
   has_secure_password validations: false
-
   has_one_attached :profile_picture
+  has_many :injuries, dependent: :destroy
 
   enum role: { user: 0, instructor: 1, admin: 2 }
 
@@ -16,14 +16,8 @@ class User < ApplicationRecord
   validates :phone, presence: { message: "El teléfono es requerido" }
   validates :role, presence: { message: "El rol es requerido" }
 
-  # Campos que se incluyen en la respuesta del token
-  PUBLIC_ATTRIBUTES = %w[id email name last_name phone role gender birthdate].freeze
+  before_update :purge_old_profile_picture, if: :profile_picture_changed?
 
-  def public_attributes
-    data = attributes.slice(*PUBLIC_ATTRIBUTES)
-    data["profile_picture_url"] = profile_picture.attached? ? Rails.application.routes.url_helpers.url_for(profile_picture) : nil
-    data
-  end
 
   def generate_password_reset_token!
     token = SecureRandom.uuid
@@ -40,6 +34,16 @@ class User < ApplicationRecord
   end
 
   private
+  def profile_picture_changed?
+    profile_picture.attached? && profile_picture.blob_id_changed?
+  end
+
+  def purge_old_profile_picture
+    # Purga la imagen anterior de Cloudinary de manera segura
+    profile_picture.purge_later
+  end
+
+
   def password_presence_if_local
     # Si no es Google, requiere password
     if provider.blank? && (password_digest.blank? && password.blank?)

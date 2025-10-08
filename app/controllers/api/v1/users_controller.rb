@@ -1,25 +1,33 @@
 class Api::V1::UsersController < ApplicationController
+  include Filterable
+
   before_action :set_user, only: [ :show, :update, :destroy ]
   before_action :authenticate_user!, except: [ :send_password_reset, :reset_password ]
 
   # GET /api/v1/users
   def index
     @users = User.all.order(:created_at)
+
+    # Apply filters
+    @users = apply_filters(@users, filter_params)
+
+    # Apply pagination
+    @users = paginate_collection(@users, page: params[:page], per_page: params[:per_page])
+
     authorize @users
     render json: {
-      success: true,
-      data: @users.map(&:public_attributes),
-      total: @users.count
+      users: ActiveModelSerializers::SerializableResource.new(
+        @users,
+        each_serializer: Api::V1::UsersSerializer
+      ),
+      pagination: pagination_metadata(@users)
     }
   end
 
   # GET /api/v1/users/:id
   def show
     authorize @user
-    render json: {
-      success: true,
-      data: @user.public_attributes
-    }
+    render json: @user, serializer: Api::V1::UsersSerializer
   end
 
   # POST /api/v1/users
@@ -27,17 +35,9 @@ class Api::V1::UsersController < ApplicationController
     @user = User.new(user_params)
     authorize @user
     if @user.save
-      render json: {
-        success: true,
-        message: "Usuario creado exitosamente",
-        data: @user.public_attributes
-      }, status: :created
+      render json: @user, serializer: Api::V1::UsersSerializer, status: :created
     else
-      render json: {
-        success: false,
-        message: "Error al crear el usuario",
-        errors: @user.errors.full_messages
-      }, status: :unprocessable_entity
+      render json: @user.errors, status: :unprocessable_entity
     end
   end
 
@@ -47,17 +47,9 @@ class Api::V1::UsersController < ApplicationController
     authorize @user
 
     if @user.update(user_params)
-      render json: {
-        success: true,
-        message: "Usuario actualizado exitosamente",
-        data: @user.public_attributes
-      }
+      render json: @user, serializer: Api::V1::UsersSerializer
     else
-      render json: {
-        success: false,
-        message: "Error al actualizar el usuario",
-        errors: @user.errors.full_messages
-      }, status: :unprocessable_entity
+      render json: @user.errors, status: :unprocessable_entity
     end
   end
 
@@ -73,7 +65,7 @@ class Api::V1::UsersController < ApplicationController
       render json: {
         success: false,
         message: "Error al eliminar el usuario",
-        errors: @user.errors.full_messages
+        errors: @user.errors, status: :unprocessable_entity
       }, status: :unprocessable_entity
     end
   end
@@ -84,37 +76,37 @@ class Api::V1::UsersController < ApplicationController
       @user.generate_password_reset_token!
       UserMailer.password_reset(@user).deliver_later
     end
-  
+
     render json: {
       success: true,
       message: "Si el correo existe en nuestro sistema, se enviará un enlace de recuperación"
     }
   end
-  
+
   def reset_password
     @user = User.find_by(reset_password_token: params[:reset_password_token])
-  
+
     if @user.nil?
       return render json: {
         success: false,
         message: "Token de restablecimiento de contraseña inválido"
       }, status: :unauthorized
     end
-  
+
     unless @user.reset_token_valid?
       return render json: {
         success: false,
         message: "El token ha expirado"
       }, status: :unauthorized
     end
-  
+
     if params[:password].blank?
       return render json: {
         success: false,
         message: "La nueva contraseña no puede estar vacía"
       }, status: :unprocessable_entity
     end
-  
+
     if @user.update(password: params[:password])
       @user.clear_reset_token!
       render json: {
@@ -125,11 +117,11 @@ class Api::V1::UsersController < ApplicationController
       render json: {
         success: false,
         message: "Error al restablecer la contraseña",
-        errors: @user.errors.full_messages
+        errors: @user.errors, status: :unprocessable_entity
       }, status: :unprocessable_entity
     end
   end
-  
+
 
   private
 
@@ -142,12 +134,16 @@ class Api::V1::UsersController < ApplicationController
     }, status: :not_found
   end
 
+  def filter_params
+    params.permit(:search, :role, :gender, :date_from, :date_to)
+  end
+
   def user_params
     # Filtrar parámetros según el rol del usuario actual
     permitted_params = [ :name, :last_name, :email, :phone, :gender, :birthdate, :profile_picture ]
 
     # Solo permitir cambiar password si no es un usuario de Google
-    if params[:user][:password].present? && @user&.provider.blank?
+    if params[:user] && params[:user][:password].present? && @user&.provider.blank?
       permitted_params += [ :password, :password_confirmation ]
     end
 
@@ -156,6 +152,11 @@ class Api::V1::UsersController < ApplicationController
       permitted_params << :role
     end
 
-    params.require(:user).permit(permitted_params)
+    # Handle both nested (:user) and direct parameter formats
+    if params[:user]
+      params.require(:user).permit(permitted_params)
+    else
+      params.permit(permitted_params)
+    end
   end
 end

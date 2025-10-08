@@ -273,15 +273,23 @@ Limpia todos los tokens expirados del sistema. Solo disponible para administrado
 ### 1. Listar Usuarios
 **GET** `/users`
 
-Obtiene la lista de todos los usuarios.
+Obtiene la lista de todos los usuarios con filtrado y paginación.
 
 **Headers:** `Authorization: Bearer <access_token>`
+
+**Parámetros de Filtrado:**
+- `search`: Búsqueda en nombre, apellido y email
+- `role`: Filtrar por rol (user, instructor, admin)
+- `gender`: Filtrar por género (hombre, mujer, otro)
+- `date_from`: Fecha de creación desde (YYYY-MM-DD)
+- `date_to`: Fecha de creación hasta (YYYY-MM-DD)
+- `page`: Número de página (por defecto: 1)
+- `per_page`: Elementos por página (por defecto: 10, máximo: 100)
 
 **Response (200 OK):**
 ```json
 {
-  "success": true,
-  "data": [
+  "users": [
     {
       "id": 1,
       "email": "usuario@ejemplo.com",
@@ -294,8 +302,29 @@ Obtiene la lista de todos los usuarios.
       "profile_picture_url": null
     }
   ],
-  "total": 1
+  "pagination": {
+    "current_page": 1,
+    "total_pages": 5,
+    "total_count": 47,
+    "per_page": 10,
+    "has_next_page": true,
+    "has_prev_page": false
+  }
 }
+```
+
+**Nota:** Todos los endpoints que utilizan paginación y filtros devuelven el mismo formato de respuesta estandarizado con los datos serializados usando ActiveModelSerializers y metadatos de paginación consistentes.
+
+**Ejemplos de Filtrado:**
+```bash
+# Buscar instructores
+GET /api/v1/users?search=Juan&role=instructor&page=1&per_page=10
+
+# Filtrar por género y rango de fechas
+GET /api/v1/users?gender=mujer&date_from=2024-01-01&date_to=2024-12-31
+
+# Búsqueda textual
+GET /api/v1/users?search=María&page=1&per_page=15
 ```
 
 ### 2. Obtener Usuario
