@@ -158,37 +158,6 @@ SMTP_PASSWORD=your-app-password
 | **Filtrado y Paginación** | ✅ Implementado |
 | **Recursos con Filtrado** | 4 (Usuarios, Lesiones, Clases, Reservas) |
 
-## 🛠️ Herramientas de Desarrollo
-
-### Testing
-```bash
-# Ejecutar tests
-rails test
-
-# Tests con coverage
-COVERAGE=true rails test
-```
-
-### Linting
-```bash
-# RuboCop
-bundle exec rubocop
-
-# Brakeman (seguridad)
-bundle exec brakeman
-```
-
-### Base de Datos
-```bash
-# Ver estado de migraciones
-rails db:migrate:status
-
-# Rollback
-rails db:rollback
-
-# Reset completo
-rails db:reset
-```
 
 ## 📝 Convenciones de la API
 
@@ -233,40 +202,3 @@ GET /api/v1/class_sessions?instructor_id=3&date_from=2024-01-01
 GET /api/v1/reservations?user_id=1&date_from=2024-01-01&date_to=2024-01-31
 ```
 
-## 🔄 Próximas Funcionalidades
-
-### Completadas ✅
-- [x] Sistema de clases de pilates
-- [x] Reservas de clases
-- [x] Sistema de filtrado y paginación
-- [x] Documentación completa de API
-
-### En Desarrollo
-- [ ] Gestión avanzada de instructores
-- [ ] Sistema de pagos
-- [ ] Notificaciones push
-
-### Planificadas
-- [ ] Dashboard de administración
-- [ ] Reportes y analytics
-- [ ] Integración con calendarios
-- [ ] Sistema de membresías
-- [ ] App móvil
-
-## 📞 Soporte
-
-Para reportar bugs, solicitar funcionalidades o hacer preguntas:
-
-1. **Issues**: Crear un issue en el repositorio
-2. **Documentación**: Revisar la documentación específica de cada recurso
-3. **Desarrollo**: Contactar al equipo de desarrollo
-
-## 📄 Licencia
-
-Este proyecto está bajo la licencia [MIT](LICENSE).
-
----
-
-**Última actualización**: Enero 2024  
-**Versión de la API**: v1  
-**Estado**: En desarrollo activo
