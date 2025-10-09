@@ -8,7 +8,7 @@ class User < ApplicationRecord
   enum gender: { male: "hombre", female: "mujer", other: "otro" }
 
   validates :email, presence: { message: "El email es requerido" }, uniqueness: { message: "El email ya está en uso" }
-  validates :password, length: { minimum: 6, message: "La contraseña debe tener al menos 6 caracteres" }
+  validates :password, length: { minimum: 6, message: "La contraseña debe tener al menos 6 caracteres" }, if: -> { password.present? }
   validate :password_presence_if_local
   validates :birthdate, presence: { message: "La fecha de nacimiento es requerida" }
   validates :gender, presence: { message: "El género es requerido" }
@@ -22,10 +22,13 @@ class User < ApplicationRecord
 
   def generate_password_reset_token!
     token = SecureRandom.alphanumeric(6).upcase
-    update!(reset_password_token: token, reset_password_sent_at: Time.current)
+    update_columns(
+      reset_password_token: token,
+      reset_password_sent_at: Time.current
+    )
     token
   end
-
+  
   def reset_token_valid?
     reset_password_sent_at.present? && reset_password_sent_at > 2.hour.ago
   end
