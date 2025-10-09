@@ -2,7 +2,7 @@ class Api::V1::UsersController < ApplicationController
   include Filterable
 
   before_action :set_user, only: [ :show, :update, :destroy ]
-  before_action :authenticate_user!, except: [ :send_password_reset, :reset_password ]
+  before_action :authenticate_user!, except: [ :send_password_reset, :reset_password, :validate_password_reset_token ]
 
   # GET /api/v1/users
   def index
@@ -120,6 +120,16 @@ class Api::V1::UsersController < ApplicationController
         errors: @user.errors, status: :unprocessable_entity
       }, status: :unprocessable_entity
     end
+  end
+
+  def validate_password_reset_token
+    return render json: { message: "Token de restablecimiento de contraseña inválido" }, status: :unauthorized if params[:reset_password_token].blank?
+
+    @user = User.find_by(reset_password_token: params[:reset_password_token])
+    return render json: { message: "Token de restablecimiento de contraseña inválido" }, status: :unauthorized if @user.nil?
+    return render json: { message: "Token de restablecimiento de contraseña expirado" }, status: :unauthorized unless @user.reset_token_valid?
+
+    render json: { message: "Token de restablecimiento de contraseña válido" }, status: :ok
   end
 
 

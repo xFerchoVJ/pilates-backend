@@ -19,6 +19,7 @@ Rails.application.routes.draw do
       end
       resources :users do
         collection do
+          post "validate_password_reset_token"
           post "send_password_reset"
           patch "reset_password"
         end
