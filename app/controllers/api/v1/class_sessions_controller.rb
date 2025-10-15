@@ -7,8 +7,8 @@ class Api::V1::ClassSessionsController < ApplicationController
   def index
     @class_sessions = ClassSession.includes(:instructor, :reservations).order(:start_time)
 
-    # Apply filters
-    @class_sessions = apply_filters(@class_sessions, filter_params)
+    # Apply filters via service
+    @class_sessions = Filters::ClassSessionsFilter.call(@class_sessions, filter_params)
 
     # Apply pagination
     @class_sessions = paginate_collection(@class_sessions, page: params[:page], per_page: params[:per_page])

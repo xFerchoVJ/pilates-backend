@@ -16,6 +16,19 @@ class ClassSession < ApplicationRecord
     spots_left <= 0
   end
 
+  # Query scopes for filtering
+  scope :search_text, ->(term) {
+    t = "%#{term}%"
+    where("name ILIKE ? OR description ILIKE ?", t, t)
+  }
+  scope :by_instructor, ->(instructor_id) { where(instructor_id: instructor_id) }
+  scope :capacity_min, ->(min) { where("capacity >= ?", min.to_i) }
+  scope :capacity_max, ->(max) { where("capacity <= ?", max.to_i) }
+  scope :start_time_from, ->(time) { where("start_time >= ?", parse_time(time)) }
+  scope :start_time_to, ->(time) { where("start_time <= ?", parse_time(time)) }
+  scope :date_from, ->(date) { where("start_time >= ?", date.beginning_of_day) }
+  scope :date_to, ->(date) { where("start_time <= ?", date.end_of_day) }
+
   private
 
   def end_after_start
@@ -27,5 +40,11 @@ class ClassSession < ApplicationRecord
     return if instructor_id.blank?
     user = User.find_by(id: instructor_id)
     errors.add(:instructor, "debe ser instructor") unless user&.instructor?
+  end
+
+  def self.parse_time(value)
+    Time.parse(value)
+  rescue ArgumentError, TypeError
+    nil
   end
 end

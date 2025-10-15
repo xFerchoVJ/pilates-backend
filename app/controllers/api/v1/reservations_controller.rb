@@ -7,8 +7,8 @@ class Api::V1::ReservationsController < ApplicationController
   def index
     @reservations = Reservation.includes(:user, :class_session).order(:created_at)
 
-    # Apply filters
-    @reservations = apply_filters(@reservations, filter_params)
+    # Apply filters via service
+    @reservations = Filters::ReservationsFilter.call(@reservations, filter_params)
 
     # Apply pagination
     @reservations = paginate_collection(@reservations, page: params[:page], per_page: params[:per_page])

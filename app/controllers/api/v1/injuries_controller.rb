@@ -7,8 +7,8 @@ class Api::V1::InjuriesController < ApplicationController
   def index
     @injuries = Injury.includes(:user).order(:created_at)
 
-    # Apply filters
-    @injuries = apply_filters(@injuries, filter_params)
+    # Apply filters via service
+    @injuries = Filters::InjuriesFilter.call(@injuries, filter_params)
 
     # Apply pagination
     @injuries = paginate_collection(@injuries, page: params[:page], per_page: params[:per_page])
@@ -63,8 +63,8 @@ class Api::V1::InjuriesController < ApplicationController
 
     @injuries = Injury.includes(:user).where(user_id: params[:user_id]).order(:created_at)
 
-    # Apply filters
-    @injuries = apply_filters(@injuries, filter_params)
+    # Apply filters via service
+    @injuries = Filters::InjuriesFilter.call(@injuries, filter_params)
 
     # Apply pagination
     @injuries = paginate_collection(@injuries, page: params[:page], per_page: params[:per_page])
