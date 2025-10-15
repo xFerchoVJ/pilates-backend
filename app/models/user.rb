@@ -6,9 +6,25 @@ class User < ApplicationRecord
   enum role: { user: 0, instructor: 1, admin: 2 }
 
   enum gender: { male: "hombre", female: "mujer", other: "otro" }
+  enum has_injuries: { pending: "pending", yes: "yes", no: "no" }
+
+  # Query scopes for filtering
+  scope :search_text, ->(term) {
+    t = "%#{term}%"
+    where("name ILIKE ? OR last_name ILIKE ? OR email ILIKE ?", t, t, t)
+  }
+
+  scope :by_role, ->(role_value) { where(role: role_value) }
+  scope :by_gender, ->(gender_value) { where(gender: gender_value) }
+  scope :created_from, ->(date) { where("created_at >= ?", date.beginning_of_day) }
+  scope :created_to, ->(date) { where("created_at <= ?", date.end_of_day) }
+  scope :with_injuries_state, ->(state) { where(has_injuries: state) }
 
   validates :email, presence: { message: "El email es requerido" }, uniqueness: { message: "El email ya está en uso" }
-  validates :password, length: { minimum: 6, message: "La contraseña debe tener al menos 6 caracteres" }
+  validates :password,
+    presence: { message: "La contraseña es obligatoria" },
+    length: { minimum: 6, message: "La contraseña debe tener al menos 6 caracteres" },
+    if: -> { new_record? || password.present? }
   validate :password_presence_if_local
   validates :birthdate, presence: { message: "La fecha de nacimiento es requerida" }
   validates :gender, presence: { message: "El género es requerido" }
@@ -50,5 +66,8 @@ class User < ApplicationRecord
     if provider.blank? && (password_digest.blank? && password.blank?)
       errors.add(:password, "no puede estar vacío")
     end
+  end
+
+  def password_required?
   end
 end

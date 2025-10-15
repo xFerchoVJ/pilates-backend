@@ -281,6 +281,7 @@ Obtiene la lista de todos los usuarios con filtrado y paginación.
 - `search`: Búsqueda en nombre, apellido y email
 - `role`: Filtrar por rol (user, instructor, admin)
 - `gender`: Filtrar por género (hombre, mujer, otro)
+- `has_injuries`: Filtrar por estado de lesiones (pending, yes, no)
 - `date_from`: Fecha de creación desde (YYYY-MM-DD)
 - `date_to`: Fecha de creación hasta (YYYY-MM-DD)
 - `page`: Número de página (por defecto: 1)
@@ -299,7 +300,8 @@ Obtiene la lista de todos los usuarios con filtrado y paginación.
       "role": "user",
       "gender": "hombre",
       "birthdate": "1990-01-01",
-      "profile_picture_url": null
+      "profile_picture_url": null,
+      "has_injuries": "pending"
     }
   ],
   "pagination": {
@@ -325,6 +327,9 @@ GET /api/v1/users?gender=mujer&date_from=2024-01-01&date_to=2024-12-31
 
 # Búsqueda textual
 GET /api/v1/users?search=María&page=1&per_page=15
+
+# Usuarios con lesiones reportadas
+GET /api/v1/users?has_injuries=yes
 ```
 
 ### 2. Obtener Usuario
@@ -347,7 +352,8 @@ Obtiene los datos de un usuario específico.
     "role": "user",
     "gender": "hombre",
     "birthdate": "1990-01-01",
-    "profile_picture_url": null
+    "profile_picture_url": null,
+    "has_injuries": "pending"
   }
 }
 ```
@@ -378,7 +384,8 @@ Crea un nuevo usuario.
     "phone": "+1234567891",
     "gender": "mujer",
     "birthdate": "1992-05-15",
-    "role": "user"
+    "role": "user",
+    "has_injuries": "pending"
   }
 }
 ```
@@ -397,7 +404,8 @@ Crea un nuevo usuario.
     "role": "user",
     "gender": "mujer",
     "birthdate": "1992-05-15",
-    "profile_picture_url": null
+    "profile_picture_url": null,
+    "has_injuries": "pending"
   }
 }
 ```
@@ -415,7 +423,8 @@ Actualiza los datos de un usuario.
   "user": {
     "name": "Juan Carlos",
     "phone": "+1234567892",
-    "gender": "hombre"
+    "gender": "hombre",
+    "has_injuries": "yes"
   }
 }
 ```
@@ -434,7 +443,8 @@ Actualiza los datos de un usuario.
     "role": "user",
     "gender": "hombre",
     "birthdate": "1990-01-01",
-    "profile_picture_url": null
+    "profile_picture_url": null,
+    "has_injuries": "Pending"
   }
 }
 ```
@@ -519,9 +529,18 @@ Restablece la contraseña usando el token enviado por email.
   "profile_picture_url": "string (URL de la imagen o null)",
   "provider": "string (null para usuarios locales, 'google' para OAuth)",
   "uid": "string (ID del proveedor OAuth)",
-  "google_email_verified": "boolean (solo para usuarios Google)"
+  "google_email_verified": "boolean (solo para usuarios Google)",
+  "has_injuries": "enum (pending, yes, no) — default: pending"
 }
 ```
+
+#### Campo: has_injuries
+- Valores permitidos: `pending`, `yes`, `no`
+- Descripción: Indica si el usuario reporta lesiones pendientes o activas.
+- Default: `pending`
+- Actualización: Editable mediante `PATCH /users/:id`.
+  - Entrada: usar valores en minúsculas (`pending`, `yes`, `no`).
+  - Salida: se serializa como string; puede mostrarse humanizado en algunas vistas.
 
 ## Códigos de Estado HTTP
 

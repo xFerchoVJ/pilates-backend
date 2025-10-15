@@ -8,8 +8,8 @@ class Api::V1::UsersController < ApplicationController
   def index
     @users = User.all.order(:created_at)
 
-    # Apply filters
-    @users = apply_filters(@users, filter_params)
+    # Apply filters via service
+    @users = Filters::UsersFilter.call(@users, filter_params)
 
     # Apply pagination
     @users = paginate_collection(@users, page: params[:page], per_page: params[:per_page])
@@ -145,12 +145,12 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def filter_params
-    params.permit(:search, :role, :gender, :date_from, :date_to)
+    params.permit(:search, :role, :gender, :date_from, :date_to, :has_injuries)
   end
 
   def user_params
     # Filtrar parámetros según el rol del usuario actual
-    permitted_params = [ :name, :last_name, :email, :phone, :gender, :birthdate, :profile_picture ]
+    permitted_params = [ :name, :last_name, :email, :phone, :gender, :birthdate, :profile_picture, :has_injuries ]
 
     # Solo permitir cambiar password si no es un usuario de Google
     if params[:user] && params[:user][:password].present? && @user&.provider.blank?
