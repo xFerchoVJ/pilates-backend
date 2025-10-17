@@ -125,18 +125,7 @@ class Api::V1::AuthController < ApplicationController
     )
 
     {
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        last_name: user.last_name,
-        phone: user.phone,
-        role: user.role,
-        gender: user.gender,
-        birthdate: user.birthdate,
-        profile_picture_url: user.profile_picture.attached? ? user.profile_picture.url : nil,
-        injuries: user.injuries
-      },
+      user: Api::V1::UsersSerializer.new(user),
       access_token: access_token,
       expires_in: JwtService.access_exp.to_i,
       refresh_token: refresh_jti

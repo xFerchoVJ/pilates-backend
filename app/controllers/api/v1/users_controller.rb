@@ -9,7 +9,7 @@ class Api::V1::UsersController < ApplicationController
     @users = User.all.order(:created_at)
 
     # Apply filters via service
-    @users = Filters::UsersFilter.call(@users, filter_params)
+    @users = ::Filters::UsersFilter.call(@users, filter_params)
 
     # Apply pagination
     @users = paginate_collection(@users, page: params[:page], per_page: params[:per_page])
