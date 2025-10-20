@@ -12,6 +12,137 @@ components:
 security:
 - bearerAuth: []
 paths:
+  "/api/v1/lounges_designs":
+    get:
+      summary: list lounges_designs
+      tags:
+      - LoungesDesigns
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: successful
+    post:
+      summary: create lounge_design
+      tags:
+      - LoungesDesigns
+      security:
+      - bearerAuth: []
+      parameters: []
+      responses:
+        '201':
+          description: created
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                lounge_design:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    description:
+                      type: string
+                    layout_json:
+                      type: object
+                      properties:
+                        spaces:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              label:
+                                type: string
+                              x:
+                                type: integer
+                              "y":
+                                type: integer
+                      required:
+                      - spaces
+                  required:
+                  - name
+                  - description
+                  - layout_json
+        required: true
+  "/api/v1/lounges_designs/{id}":
+    get:
+      summary: show lounge_design
+      tags:
+      - LoungesDesigns
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: lounge_design id
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: successful
+    patch:
+      summary: update lounge_design
+      tags:
+      - LoungesDesigns
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: lounge_design id
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: successful
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                lounge_design:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    description:
+                      type: string
+                    layout_json:
+                      type: object
+                      properties:
+                        spaces:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              label:
+                                type: string
+                              x:
+                                type: integer
+                              "y":
+                                type: integer
+        required: true
+    delete:
+      summary: delete lounge_design
+      tags:
+      - LoungesDesigns
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: lounge_design id
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: no content
   "/api/v1/signup":
     post:
       summary: signup auth
