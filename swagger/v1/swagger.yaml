@@ -1,0 +1,916 @@
+---
+openapi: 3.0.1
+info:
+  title: API V1 Luum Pilates
+  version: v1
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+- bearerAuth: []
+paths:
+  "/api/v1/signup":
+    post:
+      summary: signup auth
+      tags:
+      - Auth
+      parameters: []
+      responses:
+        '201':
+          description: created
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  minLength: 6
+                name:
+                  type: string
+                last_name:
+                  type: string
+                phone:
+                  type: string
+                role:
+                  type: string
+                  enum:
+                  - user
+                  - instructor
+                  - admin
+                gender:
+                  type: string
+                  enum:
+                  - hombre
+                  - mujer
+                  - otro
+                birthdate:
+                  type: string
+                  format: date
+              required:
+              - email
+              - password
+              - name
+              - last_name
+              - phone
+              - role
+              - gender
+              - birthdate
+        required: true
+  "/api/v1/login":
+    post:
+      summary: login auth
+      tags:
+      - Auth
+      parameters:
+      - name: email
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: password
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: successful
+  "/api/v1/google":
+    post:
+      summary: google auth
+      tags:
+      - Auth
+      parameters:
+      - name: id_token
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: successful
+  "/api/v1/refresh":
+    post:
+      summary: refresh auth
+      tags:
+      - Auth
+      parameters:
+      - name: refresh_token
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: successful
+  "/api/v1/logout":
+    post:
+      summary: logout auth
+      tags:
+      - Auth
+      parameters:
+      - name: Authorization
+        in: header
+        schema:
+          type: string
+        required: false
+        description: Bearer access token (optional)
+      - name: refresh_token
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: successful
+  "/api/v1/logout_all":
+    post:
+      summary: logout_all auth
+      tags:
+      - Auth
+      parameters:
+      - name: Authorization
+        in: header
+        schema:
+          type: string
+        required: true
+        description: Bearer access token
+      responses:
+        '200':
+          description: successful
+  "/api/v1/cleanup_tokens":
+    post:
+      summary: cleanup_tokens auth
+      tags:
+      - Auth
+      parameters:
+      - name: Authorization
+        in: header
+        schema:
+          type: string
+        required: true
+        description: Bearer access token (admin only)
+      responses:
+        '200':
+          description: successful
+  "/api/v1/class_sessions":
+    get:
+      summary: list class_sessions
+      tags:
+      - ClassSessions
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+      - name: per_page
+        in: query
+        schema:
+          type: integer
+      - name: search
+        in: query
+        schema:
+          type: string
+      - name: instructor_id
+        in: query
+        schema:
+          type: integer
+      - name: lounge_id
+        in: query
+        schema:
+          type: integer
+      - name: date_from
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: date_to
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: start_time_from
+        in: query
+        schema:
+          type: string
+      - name: start_time_to
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: successful
+    post:
+      summary: create class_session
+      tags:
+      - ClassSessions
+      security:
+      - bearerAuth: []
+      parameters: []
+      responses:
+        '201':
+          description: created
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                class_session:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    description:
+                      type: string
+                    start_time:
+                      type: string
+                      description: ISO8601 datetime
+                    end_time:
+                      type: string
+                      description: ISO8601 datetime
+                    instructor_id:
+                      type: integer
+                    lounge_id:
+                      type: integer
+                  required:
+                  - name
+                  - start_time
+                  - end_time
+                  - instructor_id
+                  - lounge_id
+        required: true
+  "/api/v1/class_sessions/{id}":
+    parameters:
+    - name: id
+      in: path
+      description: class session id
+      required: true
+      schema:
+        type: string
+    get:
+      summary: show class_session
+      tags:
+      - ClassSessions
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: successful
+    patch:
+      summary: update class_session
+      tags:
+      - ClassSessions
+      security:
+      - bearerAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: successful
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                class_session:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    description:
+                      type: string
+    delete:
+      summary: delete class_session
+      tags:
+      - ClassSessions
+      security:
+      - bearerAuth: []
+      responses:
+        '204':
+          description: no content
+  "/api/v1/injuries":
+    get:
+      summary: list injuries
+      tags:
+      - Injuries
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+      - name: per_page
+        in: query
+        schema:
+          type: integer
+      - name: search
+        in: query
+        schema:
+          type: string
+      - name: user_id
+        in: query
+        schema:
+          type: integer
+      - name: severity
+        in: query
+        schema:
+          type: string
+          enum:
+          - leve
+          - moderada
+          - grave
+      - name: recovered
+        in: query
+        schema:
+          type: boolean
+      - name: date_from
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: date_to
+        in: query
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: successful
+    post:
+      summary: create injury
+      tags:
+      - Injuries
+      security:
+      - bearerAuth: []
+      parameters: []
+      responses:
+        '201':
+          description: created
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                injury:
+                  type: object
+                  properties:
+                    user_id:
+                      type: integer
+                    injury_type:
+                      type: string
+                    description:
+                      type: string
+                    severity:
+                      type: string
+                      enum:
+                      - leve
+                      - moderada
+                      - grave
+                    date_ocurred:
+                      type: string
+                      format: date
+                    recovered:
+                      type: boolean
+                  required:
+                  - user_id
+                  - injury_type
+                  - recovered
+        required: true
+  "/api/v1/injuries/{id}":
+    parameters:
+    - name: id
+      in: path
+      description: injury id
+      required: true
+      schema:
+        type: string
+    get:
+      summary: show injury
+      tags:
+      - Injuries
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: successful
+    patch:
+      summary: update injury
+      tags:
+      - Injuries
+      security:
+      - bearerAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: successful
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                injury:
+                  type: object
+                  properties:
+                    description:
+                      type: string
+                    recovered:
+                      type: boolean
+    delete:
+      summary: delete injury
+      tags:
+      - Injuries
+      security:
+      - bearerAuth: []
+      responses:
+        '204':
+          description: no content
+  "/api/v1/injuries/injuries_by_user":
+    get:
+      summary: injuries_by_user injuries
+      tags:
+      - Injuries
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: user_id
+        in: query
+        schema:
+          type: integer
+        required: true
+      responses:
+        '200':
+          description: successful
+  "/api/v1/lounges":
+    get:
+      summary: list lounges
+      tags:
+      - Lounges
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+      - name: per_page
+        in: query
+        schema:
+          type: integer
+      - name: search
+        in: query
+        schema:
+          type: string
+      - name: lounge_design_id
+        in: query
+        schema:
+          type: integer
+      - name: date_from
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: date_to
+        in: query
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: successful
+    post:
+      summary: create lounge
+      tags:
+      - Lounges
+      security:
+      - bearerAuth: []
+      parameters: []
+      responses:
+        '201':
+          description: created
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                lounge:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    description:
+                      type: string
+                    lounge_design_id:
+                      type: integer
+                  required:
+                  - name
+                  - description
+                  - lounge_design_id
+        required: true
+  "/api/v1/lounges/{id}":
+    parameters:
+    - name: id
+      in: path
+      description: lounge id
+      required: true
+      schema:
+        type: string
+    get:
+      summary: show lounge
+      tags:
+      - Lounges
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: successful
+    patch:
+      summary: update lounge
+      tags:
+      - Lounges
+      security:
+      - bearerAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: successful
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                lounge:
+                  type: object
+                  properties:
+                    description:
+                      type: string
+    delete:
+      summary: delete lounge
+      tags:
+      - Lounges
+      security:
+      - bearerAuth: []
+      responses:
+        '204':
+          description: no content
+  "/api/v1/reservations":
+    get:
+      summary: list reservations
+      tags:
+      - Reservations
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+      - name: per_page
+        in: query
+        schema:
+          type: integer
+      - name: user_id
+        in: query
+        schema:
+          type: integer
+      - name: class_session_id
+        in: query
+        schema:
+          type: integer
+      - name: class_space_id
+        in: query
+        schema:
+          type: integer
+      - name: date_from
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: date_to
+        in: query
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: successful
+    post:
+      summary: create reservation
+      tags:
+      - Reservations
+      security:
+      - bearerAuth: []
+      parameters: []
+      responses:
+        '201':
+          description: created
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reservation:
+                  type: object
+                  properties:
+                    user_id:
+                      type: integer
+                    class_session_id:
+                      type: integer
+                    class_space_id:
+                      type: integer
+                  required:
+                  - user_id
+                  - class_session_id
+                  - class_space_id
+        required: true
+  "/api/v1/reservations/{id}":
+    parameters:
+    - name: id
+      in: path
+      description: reservation id
+      required: true
+      schema:
+        type: string
+    get:
+      summary: show reservation
+      tags:
+      - Reservations
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: successful
+    patch:
+      summary: update reservation
+      tags:
+      - Reservations
+      security:
+      - bearerAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: successful
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reservation:
+                  type: object
+                  properties:
+                    class_space_id:
+                      type: integer
+    delete:
+      summary: delete reservation
+      tags:
+      - Reservations
+      security:
+      - bearerAuth: []
+      responses:
+        '204':
+          description: no content
+  "/api/v1/users":
+    get:
+      summary: list users
+      tags:
+      - Users
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+      - name: per_page
+        in: query
+        schema:
+          type: integer
+      - name: search
+        in: query
+        schema:
+          type: string
+      - name: role
+        in: query
+        schema:
+          type: string
+          enum:
+          - user
+          - instructor
+          - admin
+      - name: gender
+        in: query
+        schema:
+          type: string
+          enum:
+          - hombre
+          - mujer
+          - otro
+      - name: date_from
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: date_to
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: has_injuries
+        in: query
+        schema:
+          type: string
+          enum:
+          - pending
+          - 'yes'
+          - 'no'
+      responses:
+        '200':
+          description: successful
+    post:
+      summary: create user
+      tags:
+      - Users
+      security:
+      - bearerAuth: []
+      parameters: []
+      responses:
+        '201':
+          description: created
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                      format: email
+                    password:
+                      type: string
+                      minLength: 6
+                    name:
+                      type: string
+                    last_name:
+                      type: string
+                    phone:
+                      type: string
+                    role:
+                      type: string
+                      enum:
+                      - user
+                      - instructor
+                      - admin
+                    gender:
+                      type: string
+                      enum:
+                      - hombre
+                      - mujer
+                      - otro
+                    birthdate:
+                      type: string
+                      format: date
+                    required:
+                    - email
+                    - password
+                    - name
+                    - last_name
+                    - phone
+                    - role
+                    - gender
+                    - birthdate
+        required: true
+  "/api/v1/users/{id}":
+    parameters:
+    - name: id
+      in: path
+      description: user id
+      required: true
+      schema:
+        type: string
+    get:
+      summary: show user
+      tags:
+      - Users
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: successful
+    patch:
+      summary: update user
+      tags:
+      - Users
+      security:
+      - bearerAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: successful
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    last_name:
+                      type: string
+                    phone:
+                      type: string
+                    gender:
+                      type: string
+                      enum:
+                      - hombre
+                      - mujer
+                      - otro
+                    birthdate:
+                      type: string
+                      format: date
+                    has_injuries:
+                      type: string
+                      enum:
+                      - pending
+                      - 'yes'
+                      - 'no'
+                    profile_picture:
+                      type: file
+    delete:
+      summary: delete user
+      tags:
+      - Users
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: successful
+  "/api/v1/users/send_password_reset":
+    post:
+      summary: send_password_reset users
+      tags:
+      - Users
+      parameters:
+      - name: email
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: successful
+  "/api/v1/users/reset_password":
+    patch:
+      summary: reset_password users
+      tags:
+      - Users
+      parameters:
+      - name: reset_password_token
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: password
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: successful
+  "/api/v1/users/validate_password_reset_token":
+    post:
+      summary: validate_password_reset_token users
+      tags:
+      - Users
+      parameters:
+      - name: reset_password_token
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: successful

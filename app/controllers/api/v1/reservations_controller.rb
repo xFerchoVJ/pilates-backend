@@ -1,6 +1,6 @@
 class Api::V1::ReservationsController < ApplicationController
   include Filterable
-
+  before_action :authenticate_user!
   before_action :set_reservation, only: %i[ show update destroy ]
 
   # GET /reservations
@@ -63,11 +63,11 @@ class Api::V1::ReservationsController < ApplicationController
     end
 
     def filter_params
-      params.permit(:user_id, :class_session_id, :date_from, :date_to)
+      params.permit(:user_id, :class_session_id, :class_space_id, :date_from, :date_to)
     end
 
     # Only allow a list of trusted parameters through.
     def reservation_params
-      params.require(:reservation).permit(:user_id, :class_session_id)
+      params.require(:reservation).permit(:user_id, :class_session_id, :class_space_id)
     end
 end

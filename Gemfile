@@ -57,3 +57,8 @@ end
 
 gem "active_model_serializers", "~> 0.10.15"
 gem "kaminari", "~> 1.2"
+# Swagger documentation
+gem "rswag-api"
+gem "rswag-ui"
+gem "rswag-specs"
+gem 'rspec-rails', '~> 8.0.0'

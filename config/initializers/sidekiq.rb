@@ -2,9 +2,9 @@
 
 redis_url =
   if Rails.env.development?
-    'redis://localhost:6378/0' # Redis local para desarrollo
+    "redis://localhost:6378/0" # Redis local para desarrollo
   else
-    ENV.fetch('REDIS_URL')      # Redis de producción
+    ENV.fetch("REDIS_URL")      # Redis de producción
   end
 
 Sidekiq.configure_server do |config|
@@ -17,7 +17,7 @@ end
 
 # Configurar jobs recurrentes
 Sidekiq::Cron::Job.create(
-  name: 'Cleanup Expired Tokens',
-  cron: '0 2 * * *', # Ejecutar diariamente a las 2 AM
-  class: 'CleanupExpiredTokensJob'
+  name: "Cleanup Expired Tokens",
+  cron: "0 2 * * *", # Ejecutar diariamente a las 2 AM
+  class: "CleanupExpiredTokensJob"
 )

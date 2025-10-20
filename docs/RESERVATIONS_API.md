@@ -56,7 +56,6 @@ Obtiene la lista de todas las reservaciones con filtrado y paginación.
         "description": "Clase de pilates en colchoneta",
         "start_time": "2024-01-20T09:00:00.000-06:00",
         "end_time": "2024-01-20T10:00:00.000-06:00",
-        "capacity": 12,
         "spots_left": 7,
         "instructor": {
           "id": 2,
@@ -68,6 +67,11 @@ Obtiene la lista de todas las reservaciones con filtrado y paginación.
           "birthdate": "1985-03-15",
           "profile_picture_url": null
         }
+      },
+      "class_space": {
+        "id": 10,
+        "label": "Silla A1",
+        "status": "reserved"
       }
     }
   ],
@@ -111,7 +115,6 @@ Obtiene los datos de una reservación específica.
     "description": "Clase de pilates en colchoneta",
     "start_time": "2024-01-20T09:00:00.000-06:00",
     "end_time": "2024-01-20T10:00:00.000-06:00",
-    "capacity": 12,
     "spots_left": 7,
     "instructor": {
       "id": 2,
@@ -123,6 +126,11 @@ Obtiene los datos de una reservación específica.
       "birthdate": "1985-03-15",
       "profile_picture_url": null
     }
+  },
+  "class_space": {
+    "id": 10,
+    "label": "Silla A1",
+    "status": "reserved"
   }
 }
 ```
@@ -148,7 +156,8 @@ Crea una nueva reservación para una clase.
 {
   "reservation": {
     "user_id": 1,
-    "class_session_id": 1
+    "class_session_id": 1,
+    "class_space_id": 10
   }
 }
 ```
@@ -173,7 +182,6 @@ Crea una nueva reservación para una clase.
     "description": "Clase de pilates en colchoneta",
     "start_time": "2024-01-20T09:00:00.000-06:00",
     "end_time": "2024-01-20T10:00:00.000-06:00",
-    "capacity": 12,
     "spots_left": 6,
     "instructor": {
       "id": 2,
@@ -185,6 +193,11 @@ Crea una nueva reservación para una clase.
       "birthdate": "1985-03-15",
       "profile_picture_url": null
     }
+  },
+  "class_space": {
+    "id": 10,
+    "label": "Silla A1",
+    "status": "reserved"
   }
 }
 ```
@@ -193,7 +206,12 @@ Crea una nueva reservación para una clase.
 ```json
 {
   "user_id": ["can't be blank"],
-  "class_session": ["La clase está llena"]
+  "class_session": ["La clase está llena"],
+  "class_space": [
+    "no pertenece a esta clase",
+    "ya está ocupado",
+    "no existe"
+  ]
 }
 ```
 
@@ -278,6 +296,7 @@ Elimina una reservación del sistema.
   "id": "integer (auto-incremento)",
   "user_id": "integer (requerido, referencia a User)",
   "class_session_id": "integer (requerido, referencia a ClassSession)",
+  "class_space_id": "integer (requerido, referencia a ClassSpace)",
   "created_at": "datetime (timestamp de creación)",
   "updated_at": "datetime (timestamp de última actualización)"
 }
@@ -286,23 +305,30 @@ Elimina una reservación del sistema.
 ### Relaciones
 - `user_id`: Referencia al usuario que hace la reservación
 - `class_session_id`: Referencia a la clase reservada
+- `class_space_id`: Referencia al espacio específico reservado dentro de la clase
 - La reservación pertenece a un usuario (`belongs_to :user`)
 - La reservación pertenece a una clase (`belongs_to :class_session`)
+- La reservación pertenece a un espacio de clase (`belongs_to :class_space`)
 
 ## Validaciones
 
 ### Campos Requeridos
 - `user_id`: Debe estar presente
 - `class_session_id`: Debe estar presente
+- `class_space_id`: Debe estar presente
 
 ### Validaciones de Negocio
 - **Unicidad**: Un usuario no puede tener múltiples reservaciones para la misma clase
 - **Capacidad**: No se puede reservar una clase que esté llena
 - **Existencia**: Tanto el usuario como la clase deben existir
+- **Espacio**: El `class_space_id` debe existir, pertenecer a la `class_session` indicada y estar disponible
 
 ### Mensajes de Error
 - `"ya tiene una reserva para esta clase"`: Cuando un usuario intenta reservar la misma clase dos veces
 - `"La clase está llena"`: Cuando la clase ha alcanzado su capacidad máxima
+- `"no pertenece a esta clase"`: Cuando el `class_space` no corresponde a la `class_session` de la reservación
+- `"ya está ocupado"`: Cuando el `class_space` ya está reservado
+- `"no existe"`: Cuando el `class_space_id` no corresponde a un `ClassSpace` existente
 
 ## Códigos de Estado HTTP
 
@@ -369,7 +395,8 @@ curl -X POST http://localhost:3000/api/v1/reservations \
   -d '{
     "reservation": {
       "user_id": 1,
-      "class_session_id": 1
+      "class_session_id": 1,
+      "class_space_id": 10
     }
   }'
 ```
@@ -407,11 +434,11 @@ curl -X PATCH http://localhost:3000/api/v1/reservations/1 \
 ## Flujo de Reservación
 
 1. **Verificar disponibilidad**: El usuario consulta las clases disponibles
-2. **Crear reservación**: Se envía una solicitud POST con `user_id` y `class_session_id`
-3. **Validar capacidad**: El sistema verifica que la clase no esté llena
-4. **Validar unicidad**: Se asegura que el usuario no tenga ya una reservación para esa clase
-5. **Crear reservación**: Si todo es válido, se crea la reservación
-6. **Actualizar capacidad**: Se actualiza el número de lugares disponibles en la clase
+2. **Crear reservación**: Se envía una solicitud POST con `user_id`, `class_session_id` y `class_space_id`
+3. **Validar espacio**: El sistema valida que el `class_space` exista, pertenezca a la clase y esté disponible
+4. **Validar capacidad**: El sistema verifica que la clase no esté llena
+5. **Validar unicidad**: Se asegura que el usuario no tenga ya una reservación para esa clase
+6. **Crear reservación**: Si todo es válido, se crea la reservación y se marca el `class_space` como `reserved`
 
 ## Consideraciones de Rendimiento
 

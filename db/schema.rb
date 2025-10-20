@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_10_15_010246) do
+ActiveRecord::Schema[7.2].define(version: 2025_10_20_020955) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -55,11 +55,23 @@ ActiveRecord::Schema[7.2].define(version: 2025_10_15_010246) do
     t.text "description"
     t.datetime "start_time", null: false
     t.datetime "end_time", null: false
-    t.integer "capacity", null: false
     t.bigint "instructor_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "lounge_id"
     t.index ["instructor_id"], name: "index_class_sessions_on_instructor_id"
+    t.index ["lounge_id"], name: "index_class_sessions_on_lounge_id"
+  end
+
+  create_table "class_spaces", force: :cascade do |t|
+    t.bigint "class_session_id", null: false
+    t.string "label"
+    t.integer "x"
+    t.integer "y"
+    t.integer "status", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["class_session_id"], name: "index_class_spaces_on_class_session_id"
   end
 
   create_table "injuries", force: :cascade do |t|
@@ -72,6 +84,23 @@ ActiveRecord::Schema[7.2].define(version: 2025_10_15_010246) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_injuries_on_user_id"
+  end
+
+  create_table "lounge_designs", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "description"
+    t.jsonb "layout_json", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "lounges", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "description"
+    t.bigint "lounge_design_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["lounge_design_id"], name: "index_lounges_on_lounge_design_id"
   end
 
   create_table "refresh_token_users", force: :cascade do |t|
@@ -92,7 +121,9 @@ ActiveRecord::Schema[7.2].define(version: 2025_10_15_010246) do
     t.bigint "class_session_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "class_space_id", null: false
     t.index ["class_session_id"], name: "index_reservations_on_class_session_id"
+    t.index ["class_space_id"], name: "index_reservations_on_class_space_id"
     t.index ["user_id"], name: "index_reservations_on_user_id"
   end
 
@@ -118,9 +149,13 @@ ActiveRecord::Schema[7.2].define(version: 2025_10_15_010246) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "class_sessions", "lounges"
   add_foreign_key "class_sessions", "users", column: "instructor_id"
+  add_foreign_key "class_spaces", "class_sessions"
   add_foreign_key "injuries", "users"
+  add_foreign_key "lounges", "lounge_designs"
   add_foreign_key "refresh_token_users", "users"
   add_foreign_key "reservations", "class_sessions"
+  add_foreign_key "reservations", "class_spaces"
   add_foreign_key "reservations", "users"
 end

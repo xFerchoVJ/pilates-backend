@@ -125,36 +125,107 @@ Crea una nueva clase de pilates.
 ```json
 {
   "class_session": {
-    "name": "Pilates Reformer",
-    "description": "Clase de pilates con máquina reformer",
-    "start_time": "2024-01-21T10:00:00",
-    "end_time": "2024-01-21T11:00:00",
-    "capacity": 8,
-    "instructor_id": 2
+    "name": "Yoga para principiantes",
+    "description": "Clase de yoga enfocada en estiramiento y respiración.",
+    "start_time": "2025-10-10T10:00:00-06:00",
+    "end_time": "2025-10-10T11:00:00-06:00",
+    "instructor_id": 7,
+    "lounge_id": 1
   }
 }
+
 ```
 
 **Response (201 Created):**
 ```json
 {
-  "id": 2,
-  "name": "Pilates Reformer",
-  "description": "Clase de pilates con máquina reformer",
-  "start_time": "2024-01-21T10:00:00.000-06:00",
-  "end_time": "2024-01-21T11:00:00.000-06:00",
-  "capacity": 8,
-  "spots_left": 8,
-  "instructor": {
-    "id": 2,
-    "email": "instructor@ejemplo.com",
-    "name": "María",
-    "last_name": "García",
-    "role": "instructor",
-    "gender": "mujer",
-    "birthdate": "1985-03-15",
-    "profile_picture_url": null
-  }
+    "class_sessions": [
+        {
+            "id": 2,
+            "name": "Yoga para principiantes",
+            "description": "Clase de yoga enfocada en estiramiento y respiración.",
+            "start_time": "2025-10-10T10:00:00-06:00",
+            "end_time": "2025-10-10T11:00:00-06:00",
+            "spots_left": 4,
+            "instructor": {
+                "id": 7,
+                "email": "instructor@example.com",
+                "name": "Instructor",
+                "last_name": "Instructor",
+                "phone": "1234567890",
+                "role": "instructor",
+                "gender": "male",
+                "birthdate": "1990-01-01",
+                "profile_picture_url": null,
+                "has_injuries": "Pending"
+            },
+            "lounge": {
+                "id": 1,
+                "name": "Salon de pilates",
+                "description": "Aquí se hacen usualmente las clases de pilates, etc"
+            },
+            "class_spaces": [
+                {
+                    "id": 1,
+                    "class_session_id": 2,
+                    "label": "1",
+                    "x": 50,
+                    "y": 300,
+                    "status": "available",
+                    "created_at": "2025-10-19T20:16:19.831-06:00",
+                    "updated_at": "2025-10-19T20:16:19.831-06:00"
+                },
+                {
+                    "id": 2,
+                    "class_session_id": 2,
+                    "label": "2",
+                    "x": 200,
+                    "y": 100,
+                    "status": "available",
+                    "created_at": "2025-10-19T20:16:19.832-06:00",
+                    "updated_at": "2025-10-19T20:16:19.832-06:00"
+                },
+                {
+                    "id": 3,
+                    "class_session_id": 2,
+                    "label": "3",
+                    "x": 400,
+                    "y": 500,
+                    "status": "reserved",
+                    "created_at": "2025-10-19T20:16:19.833-06:00",
+                    "updated_at": "2025-10-19T20:22:30.798-06:00"
+                },
+                {
+                    "id": 4,
+                    "class_session_id": 2,
+                    "label": "4",
+                    "x": 350,
+                    "y": 300,
+                    "status": "available",
+                    "created_at": "2025-10-19T20:16:19.833-06:00",
+                    "updated_at": "2025-10-19T20:16:19.833-06:00"
+                },
+                {
+                    "id": 5,
+                    "class_session_id": 2,
+                    "label": "5",
+                    "x": 400,
+                    "y": 100,
+                    "status": "available",
+                    "created_at": "2025-10-19T20:16:19.833-06:00",
+                    "updated_at": "2025-10-19T20:16:19.833-06:00"
+                }
+            ]
+        }
+    ],
+    "pagination": {
+        "current_page": 1,
+        "total_pages": 1,
+        "total_count": 1,
+        "per_page": 1,
+        "has_next_page": false,
+        "has_prev_page": false
+    }
 }
 ```
 
@@ -182,7 +253,6 @@ Actualiza los datos de una clase existente.
   "class_session": {
     "name": "Pilates Mat Avanzado",
     "description": "Clase de pilates en colchoneta para nivel avanzado",
-    "capacity": 15
   }
 }
 ```
@@ -190,23 +260,81 @@ Actualiza los datos de una clase existente.
 **Response (200 OK):**
 ```json
 {
-  "id": 1,
-  "name": "Pilates Mat Avanzado",
-  "description": "Clase de pilates en colchoneta para nivel avanzado",
-  "start_time": "2024-01-20T09:00:00.000-06:00",
-  "end_time": "2024-01-20T10:00:00.000-06:00",
-  "capacity": 15,
-  "spots_left": 11,
-  "instructor": {
     "id": 2,
-    "email": "instructor@ejemplo.com",
-    "name": "María",
-    "last_name": "García",
-    "role": "instructor",
-    "gender": "mujer",
-    "birthdate": "1985-03-15",
-    "profile_picture_url": null
-  }
+    "name": "Pilates Mat Avanzado",
+    "description": "Clase de pilates en colchoneta para nivel avanzado",
+    "start_time": "2025-10-10T10:00:00-06:00",
+    "end_time": "2025-10-10T11:00:00-06:00",
+    "spots_left": 4,
+    "instructor": {
+        "id": 7,
+        "email": "instructor@example.com",
+        "name": "Instructor",
+        "last_name": "Instructor",
+        "phone": "1234567890",
+        "role": "instructor",
+        "gender": "male",
+        "birthdate": "1990-01-01",
+        "profile_picture_url": null,
+        "has_injuries": "Pending"
+    },
+    "lounge": {
+        "id": 1,
+        "name": "Salon de pilates",
+        "description": "Aquí se hacen usualmente las clases de pilates, etc"
+    },
+    "class_spaces": [
+        {
+            "id": 1,
+            "class_session_id": 2,
+            "label": "1",
+            "x": 50,
+            "y": 300,
+            "status": "available",
+            "created_at": "2025-10-19T20:16:19.831-06:00",
+            "updated_at": "2025-10-19T20:16:19.831-06:00"
+        },
+        {
+            "id": 2,
+            "class_session_id": 2,
+            "label": "2",
+            "x": 200,
+            "y": 100,
+            "status": "available",
+            "created_at": "2025-10-19T20:16:19.832-06:00",
+            "updated_at": "2025-10-19T20:16:19.832-06:00"
+        },
+        {
+            "id": 3,
+            "class_session_id": 2,
+            "label": "3",
+            "x": 400,
+            "y": 500,
+            "status": "reserved",
+            "created_at": "2025-10-19T20:16:19.833-06:00",
+            "updated_at": "2025-10-19T20:22:30.798-06:00"
+        },
+        {
+            "id": 4,
+            "class_session_id": 2,
+            "label": "4",
+            "x": 350,
+            "y": 300,
+            "status": "available",
+            "created_at": "2025-10-19T20:16:19.833-06:00",
+            "updated_at": "2025-10-19T20:16:19.833-06:00"
+        },
+        {
+            "id": 5,
+            "class_session_id": 2,
+            "label": "5",
+            "x": 400,
+            "y": 100,
+            "status": "available",
+            "created_at": "2025-10-19T20:16:19.833-06:00",
+            "updated_at": "2025-10-19T20:16:19.833-06:00"
+        }
+    ]
 }
 ```
 
@@ -249,7 +377,7 @@ Elimina una clase del sistema.
 ```
 
 ### Campos Calculados
-- `spots_left`: Capacidad disponible (capacity - número de reservas)
+- `spots_left`: Capacidad disponible (Número de espacios disponibles (class_spaces))
 
 ## Validaciones
 
@@ -257,13 +385,12 @@ Elimina una clase del sistema.
 - `name`: Debe estar presente
 - `start_time`: Debe estar presente
 - `end_time`: Debe estar presente
-- `capacity`: Debe estar presente y ser mayor que 0
 - `instructor_id`: Debe estar presente y referenciar a un instructor válido
+- `lounge_id`: Debe estar presente y referenciar a una sala válida
 
 ### Validaciones de Negocio
 - `end_time`: Debe ser después de `start_time`
 - `instructor_id`: El usuario debe tener rol de instructor
-- `capacity`: Debe ser un número positivo
 
 ### Relaciones
 - `instructor_id`: Debe hacer referencia a un usuario existente con rol instructor

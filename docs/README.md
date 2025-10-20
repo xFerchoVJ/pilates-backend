@@ -12,9 +12,6 @@ Bienvenido a la documentación completa de la API del sistema de Pilates. Este a
 | **Clases** | Gestión de clases de pilates | [Ver documentación](./CLASS_SESSIONS_API.md) | ✅ Completo | 5 endpoints | ✅ |
 | **Reservas** | Sistema de reservas de clases | [Ver documentación](./RESERVATIONS_API.md) | ✅ Completo | 5 endpoints | ✅ |
 | **Filtrado y Paginación** | Sistema de filtrado y paginación para todos los recursos | [Ver documentación](./FILTERING_AND_PAGINATION.md) | ✅ Completo | - | ✅ |
-| **Instructores** | Gestión de instructores y sus clases | 🔄 En desarrollo | ⏳ Pendiente | - | - |
-| **Pagos** | Sistema de pagos y suscripciones | 🔄 En desarrollo | ⏳ Pendiente | - | - |
-| **Notificaciones** | Sistema de notificaciones push y email | 🔄 En desarrollo | ⏳ Pendiente | - | - |
 
 ## 🚀 Información General
 
