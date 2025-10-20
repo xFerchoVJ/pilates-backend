@@ -1,21 +1,53 @@
 class Reservation < ApplicationRecord
   belongs_to :user
   belongs_to :class_session
+  belongs_to :class_space
 
   validates :user_id, uniqueness: { scope: :class_session_id, message: "ya tiene una reserva para esta clase" }
-  validates :user_id, :class_session_id, presence: true
-
+  validates :user_id, :class_session_id, :class_space_id, presence: true
+  validate :class_space_belongs_to_class_session
+  validate :class_space_available
   validate :class_session_not_full
+  validate :class_space_must_exist
 
-  # Query scopes for filtering
-  scope :by_user, ->(user_id) { where(user_id: user_id) }
-  scope :by_class_session, ->(class_session_id) { where(class_session_id: class_session_id) }
-  scope :created_from, ->(date) { where("reservations.created_at >= ?", date.beginning_of_day) }
-  scope :created_to, ->(date) { where("reservations.created_at <= ?", date.end_of_day) }
+  before_create :mark_space_as_reserved
+  after_destroy :mark_space_as_available
 
   private
 
+  def class_space_belongs_to_class_session
+    return if class_space.nil? || class_session_id.nil?
+    unless class_space.class_session_id == class_session_id
+      errors.add(:class_space, "no pertenece a esta clase")
+    end
+  end
+
+  def class_space_available
+    return if class_space.nil?
+    if class_space.reserved?
+      errors.add(:class_space, "ya está ocupado")
+    end
+  end
+
   def class_session_not_full
+    return if class_session.nil?
     errors.add(:class_session, "La clase está llena") if class_session.full?
+  end
+
+  def class_space_must_exist
+    # Ensure provided class_space_id references an existing ClassSpace
+    if class_space_id.present? && class_space.nil?
+      errors.add(:class_space, "no existe")
+    end
+  end
+
+  def mark_space_as_reserved
+    return if class_space.nil?
+    class_space.update!(status: :reserved)
+  end
+
+  def mark_space_as_available
+    return if class_space.nil?
+    class_space.update!(status: :available)
   end
 end

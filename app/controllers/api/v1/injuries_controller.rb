@@ -1,6 +1,6 @@
 class Api::V1::InjuriesController < ApplicationController
   include Filterable
-
+  before_action :authenticate_user!
   before_action :set_injury, only: %i[ show update destroy ]
 
   # GET /api/v1/injuries

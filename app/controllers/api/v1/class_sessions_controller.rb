@@ -1,6 +1,6 @@
 class Api::V1::ClassSessionsController < ApplicationController
   include Filterable
-
+  before_action :authenticate_user!
   before_action :set_class_session, only: %i[ show update destroy ]
 
   # GET /class_sessions
@@ -63,11 +63,11 @@ class Api::V1::ClassSessionsController < ApplicationController
     end
 
     def filter_params
-      params.permit(:instructor_id, :capacity_min, :capacity_max, :date_from, :date_to, :start_time_from, :start_time_to, :search)
+      params.permit(:instructor_id, :capacity_min, :capacity_max, :date_from, :date_to, :start_time_from, :start_time_to, :search, :lounge_id)
     end
 
     # Only allow a list of trusted parameters through.
     def class_session_params
-      params.require(:class_session).permit(:name, :description, :start_time, :end_time, :capacity, :instructor_id)
+      params.require(:class_session).permit(:name, :description, :start_time, :end_time, :instructor_id, :lounge_id)
     end
 end
