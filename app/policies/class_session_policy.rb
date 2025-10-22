@@ -18,4 +18,8 @@ class ClassSessionPolicy < ApplicationPolicy
   def destroy?
     user&.admin? || user&.instructor?
   end
+
+  def create_recurring?
+    user&.admin?
+  end
 end

@@ -56,6 +56,28 @@ class Api::V1::ClassSessionsController < ApplicationController
     @class_session.destroy!
   end
 
+  def create_recurring
+    authorize ClassSession, :create_recurring?
+    days = params[:days_of_week] || []
+    start_date = Date.parse(params[:start_date])
+    end_date = Date.parse(params[:end_date])
+
+    sessions = ClassSessions::RecurringCreator.call(
+      base_params: class_session_params,
+      days_of_week: days.map(&:to_i),
+      start_date: start_date,
+      end_date: end_date
+    )
+
+    render json: {
+      created: sessions.count,
+      sessions: ActiveModelSerializers::SerializableResource.new(sessions, each_serializer: Api::V1::ClassSessionSerializer)
+    }, status: :created
+  rescue ActiveRecord::RecordInvalid => e
+    render json: { error: e.message }, status: :unprocessable_entity
+  end
+
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_class_session

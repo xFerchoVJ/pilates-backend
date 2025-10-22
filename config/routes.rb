@@ -13,7 +13,11 @@ Rails.application.routes.draw do
       post "cleanup_tokens", to: "auth#cleanup_tokens" # limpiar tokens expirados (solo admin)
 
       resources :reservations
-      resources :class_sessions
+      resources :class_sessions do
+        collection do
+          post :create_recurring
+        end
+      end
       resources :lounges
       resources :lounges_designs
       resources :injuries do

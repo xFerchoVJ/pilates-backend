@@ -238,4 +238,74 @@ RSpec.describe 'api/v1/class_sessions', type: :request do
       end
     end
   end
+
+  path '/api/v1/class_sessions/create_recurring' do
+    post("create recurring class sessions") do
+      tags 'ClassSessions'
+      consumes 'application/json'
+      produces 'application/json'
+      security [ bearerAuth: [] ]
+      parameter name: :params, in: :body, required: true, schema: {
+        type: :object,
+        properties: {
+          start_date: { type: :string, format: :date },
+          end_date: { type: :string, format: :date },
+          days_of_week: {
+            type: :array,
+            items: {
+              type: :integer,
+              description: 'Días de la semana (0 = domingo, 1 = lunes, 2 = martes, 3 = miércoles, 4 = jueves, 5 = viernes, 6 = sábado)'
+            },
+            example: [ 1, 3, 5 ]
+          },
+          class_session: {
+            type: :object,
+            properties: {
+              name: { type: :string, example: 'Yoga Matutino' },
+              description: { type: :string, example: 'Clase recurrente de yoga' },
+              start_time: { type: :string, example: '08:00' },
+              end_time: { type: :string, example: '09:00' },
+              instructor_id: { type: :integer },
+              lounge_id: { type: :integer }
+            },
+            required: %i[name start_time end_time instructor_id lounge_id]
+          }
+        },
+        required: %i[start_date end_date days_of_week class_session]
+      }
+
+      response(201, 'created') do
+        let!(:lounge_design) { create(:lounge_design) }
+        let!(:lounge) { create(:lounge, lounge_design: lounge_design) }
+        let!(:instructor) { create(:user, role: 'instructor') }
+        let(:start_date) { (Date.today + 1.week).iso8601 }
+        let(:end_date) { (Date.today + 1.month).iso8601 }
+        let(:days_of_week) { [ 1, 3, 5 ] }
+        let(:class_session) { create(:class_session, instructor: instructor, lounge: lounge) }
+
+        after do |example|
+          example.metadata[:response][:content] = {
+            'application/json' => {
+              example: JSON.parse(response.body, symbolize_names: true)
+            }
+          }
+        end
+
+        run_test!
+      end
+
+      response(422, 'unprocessable entity') do
+        let(:params) do
+          {
+            start_date: nil,
+            end_date: nil,
+            days_of_week: [],
+            class_session: {}
+          }
+        end
+
+        run_test!
+      end
+    end
+  end
 end
