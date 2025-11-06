@@ -4,7 +4,8 @@ class ClassSession < ApplicationRecord
   has_many :class_spaces, dependent: :destroy
   belongs_to :lounge
 
-  validates :name, :start_time, :end_time, :instructor_id, :lounge_id, presence: true
+  validates :name, :start_time, :end_time, :instructor_id, :lounge_id, :price, presence: true
+  validates :price, numericality: { greater_than: 0 }
 
   validate :end_after_start
   validate :user_is_instructor
@@ -32,6 +33,8 @@ class ClassSession < ApplicationRecord
   scope :start_time_to, ->(time) { where("start_time <= ?", parse_time(time)) }
   scope :date_from, ->(date) { where("start_time >= ?", date.beginning_of_day) }
   scope :date_to, ->(date) { where("start_time <= ?", date.end_of_day) }
+  scope :upcoming, -> { where("end_time >= ?", Time.current) }
+  scope :past, -> { where("end_time < ?", Time.current) }
 
   private
 

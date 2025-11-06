@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_10_20_020955) do
+ActiveRecord::Schema[7.2].define(version: 2025_11_03_060556) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -50,6 +50,17 @@ ActiveRecord::Schema[7.2].define(version: 2025_10_20_020955) do
     t.index ["jti"], name: "index_blacklisted_tokens_on_jti", unique: true
   end
 
+  create_table "class_packages", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "description"
+    t.integer "class_count", null: false
+    t.integer "price", null: false
+    t.string "currency", default: "mxn", null: false
+    t.boolean "status", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "class_sessions", force: :cascade do |t|
     t.string "name", null: false
     t.text "description"
@@ -59,6 +70,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_10_20_020955) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "lounge_id"
+    t.integer "price"
     t.index ["instructor_id"], name: "index_class_sessions_on_instructor_id"
     t.index ["lounge_id"], name: "index_class_sessions_on_lounge_id"
   end
@@ -127,6 +139,33 @@ ActiveRecord::Schema[7.2].define(version: 2025_10_20_020955) do
     t.index ["user_id"], name: "index_reservations_on_user_id"
   end
 
+  create_table "transactions", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.integer "amount", null: false
+    t.string "currency", default: "mxn", null: false
+    t.string "transaction_type", null: false
+    t.integer "reference_id", null: false
+    t.string "reference_type", null: false
+    t.string "payment_intent_id", null: false
+    t.jsonb "metadata"
+    t.string "status", default: "pending", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_transactions_on_user_id"
+  end
+
+  create_table "user_class_packages", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "class_package_id", null: false
+    t.integer "remaining_classes", null: false
+    t.string "status", default: "active", null: false
+    t.datetime "purchased_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["class_package_id"], name: "index_user_class_packages_on_class_package_id"
+    t.index ["user_id"], name: "index_user_class_packages_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email"
     t.string "password_digest"
@@ -158,4 +197,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_10_20_020955) do
   add_foreign_key "reservations", "class_sessions"
   add_foreign_key "reservations", "class_spaces"
   add_foreign_key "reservations", "users"
+  add_foreign_key "transactions", "users"
+  add_foreign_key "user_class_packages", "class_packages"
+  add_foreign_key "user_class_packages", "users"
 end

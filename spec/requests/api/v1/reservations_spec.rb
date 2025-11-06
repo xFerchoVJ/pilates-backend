@@ -223,4 +223,61 @@ RSpec.describe 'api/v1/reservations', type: :request do
       end
     end
   end
+
+  path '/api/v1/reservations/create_with_payment' do
+    post('create reservation with payment') do
+      tags 'Reservations'
+      consumes 'application/json'
+      produces 'application/json'
+      security [ bearerAuth: [] ]
+
+      parameter name: :body, in: :body, schema: {
+        type: :object,
+        properties: {
+          class_session_id: { type: :integer, example: 2 },
+          class_space_id: { type: :integer, example: 1 }
+        },
+        required: %w[class_session_id class_space_id]
+      }
+
+      response(200, 'payment intent created successfully') do
+        let(:Authorization) { "Bearer #{JwtService.encode({ sub: admin.id, role: admin.role }, exp: JwtService.access_exp.from_now)}" }
+        let(:admin) { create(:user, role: :admin) }
+        let(:class_session) { create(:class_session, price: 200) }
+        let(:class_space) { create(:class_space) }
+
+        let(:body) do
+          {
+            class_session_id: class_session.id,
+            class_space_id: class_space.id
+          }
+        end
+
+        # Stub para evitar llamada real a Stripe
+        before do
+          allow(Stripe::PaymentIntent).to receive(:create).and_return(
+            OpenStruct.new(
+              id: "pi_123",
+              client_secret: "pi_123_secret_456"
+            )
+          )
+        end
+
+        run_test! do |response|
+          data = JSON.parse(response.body)
+          expect(data['client_secret']).to eq('pi_123_secret_456')
+        end
+      end
+
+      response(422, 'invalid parameters or internal error') do
+        let(:Authorization) { "Bearer #{JwtService.encode({ sub: admin.id, role: admin.role }, exp: JwtService.access_exp.from_now)}" }
+        let(:body) { { class_session_id: nil, class_space_id: nil } }
+
+        run_test! do |response|
+          data = JSON.parse(response.body)
+          expect(data['error']).to be_present
+        end
+      end
+    end
+  end
 end

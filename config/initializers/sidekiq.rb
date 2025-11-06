@@ -34,4 +34,10 @@ else
     cron: "0 2 * * *", # Ejecutar diariamente a las 2 AM
     class: "CleanupExpiredTokensJob"
   )
+
+  Sidekiq::Cron::Job.create(
+    name: "Cleanup Past Class Sessions",
+    cron: "0 * * * *", # Ejecutar cada hora
+    class: "CleanupPastClassSessionsJob"
+  )
 end
