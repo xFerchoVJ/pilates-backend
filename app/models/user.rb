@@ -2,6 +2,10 @@ class User < ApplicationRecord
   has_secure_password validations: false
   has_one_attached :profile_picture
   has_many :injuries, dependent: :destroy
+  has_many :user_class_packages, dependent: :destroy
+  has_many :refresh_token_users, dependent: :destroy
+  has_many :reservations, dependent: :destroy
+  has_many :transactions, dependent: :destroy
 
   enum role: { user: 0, instructor: 1, admin: 2 }
 

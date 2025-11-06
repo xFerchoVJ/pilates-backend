@@ -64,3 +64,4 @@ gem "rswag-api"
 gem "rswag-ui"
 gem "rswag-specs"
 gem 'rspec-rails', '~> 8.0.0'
+gem "stripe"

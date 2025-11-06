@@ -347,6 +347,7 @@ GEM
       globalid (>= 1.0.1)
       sidekiq (>= 6)
     stringio (3.1.7)
+    stripe (17.1.0)
     thor (1.4.0)
     timeout (0.4.3)
     tzinfo (2.0.6)
@@ -395,6 +396,7 @@ DEPENDENCIES
   rubocop-rails-omakase
   sidekiq (~> 7.0)
   sidekiq-cron (~> 1.2)
+  stripe
   tzinfo-data
 
 BUNDLED WITH

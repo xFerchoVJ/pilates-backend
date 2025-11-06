@@ -12,6 +12,196 @@ components:
 security:
 - bearerAuth: []
 paths:
+  "/api/v1/class_packages":
+    get:
+      summary: list class_packages
+      tags:
+      - ClassPackages
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+      - name: per_page
+        in: query
+        schema:
+          type: integer
+      - name: search
+        in: query
+        schema:
+          type: string
+      - name: status
+        in: query
+        schema:
+          type: boolean
+      - name: currency
+        in: query
+        schema:
+          type: string
+      - name: price_min
+        in: query
+        schema:
+          type: integer
+      - name: price_max
+        in: query
+        schema:
+          type: integer
+      - name: class_count_min
+        in: query
+        schema:
+          type: integer
+      - name: class_count_max
+        in: query
+        schema:
+          type: integer
+      - name: created_from
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: created_to
+        in: query
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: successful
+    post:
+      summary: create class_package
+      tags:
+      - ClassPackages
+      security:
+      - bearerAuth: []
+      parameters: []
+      responses:
+        '201':
+          description: created
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                class_package:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    description:
+                      type: string
+                    class_count:
+                      type: integer
+                    price:
+                      type: integer
+                    currency:
+                      type: string
+                    status:
+                      type: boolean
+                  required:
+                  - name
+                  - class_count
+                  - price
+                  - currency
+        required: true
+  "/api/v1/class_packages/{id}":
+    get:
+      summary: show class_package
+      tags:
+      - ClassPackages
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: class_package id
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: successful
+    patch:
+      summary: update class_package
+      tags:
+      - ClassPackages
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: class_package id
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: successful
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                class_package:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    description:
+                      type: string
+                    class_count:
+                      type: integer
+                    price:
+                      type: integer
+                    currency:
+                      type: string
+                    status:
+                      type: boolean
+                  required:
+                  - name
+                  - class_count
+                  - price
+                  - currency
+        required: true
+    delete:
+      summary: delete class_package
+      tags:
+      - ClassPackages
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: class_package id
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: no content
+  "/api/v1/class_packages/purchase_with_payment":
+    post:
+      summary: purchase with payment
+      tags:
+      - ClassPackages
+      security:
+      - bearerAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: successful
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                class_package_id:
+                  type: integer
+        required: true
   "/api/v1/lounges_designs":
     get:
       summary: list lounges_designs
@@ -143,6 +333,130 @@ paths:
       responses:
         '204':
           description: no content
+  "/api/v1/transactions":
+    get:
+      summary: list transactions
+      tags:
+      - Transactions
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+      - name: per_page
+        in: query
+        schema:
+          type: integer
+      - name: user_id
+        in: query
+        schema:
+          type: integer
+      - name: status
+        in: query
+        schema:
+          type: string
+      - name: transaction_type
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: successful
+  "/api/v1/transactions/{id}":
+    get:
+      summary: show transaction
+      tags:
+      - Transactions
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: transaction id
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: successful
+  "/api/v1/user_class_packages":
+    get:
+      summary: list user_class_packages
+      tags:
+      - UserClassPackages
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+      - name: per_page
+        in: query
+        schema:
+          type: integer
+      - name: user_id
+        in: query
+        schema:
+          type: integer
+      - name: class_package_id
+        in: query
+        schema:
+          type: integer
+      - name: status
+        in: query
+        schema:
+          type: string
+      - name: remaining_classes_min
+        in: query
+        schema:
+          type: integer
+      - name: remaining_classes_max
+        in: query
+        schema:
+          type: integer
+      - name: purchased_from
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: purchased_to
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: date_from
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: date_to
+        in: query
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: successful
+  "/api/v1/user_class_packages/{id}":
+    get:
+      summary: show user_class_package
+      tags:
+      - UserClassPackages
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: user_class_package id
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: successful
   "/api/v1/signup":
     post:
       summary: signup auth
@@ -883,6 +1197,34 @@ paths:
       responses:
         '204':
           description: no content
+  "/api/v1/reservations/create_with_payment":
+    post:
+      summary: create reservation with payment
+      tags:
+      - Reservations
+      security:
+      - bearerAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: payment intent created successfully
+        '422':
+          description: invalid parameters or internal error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                class_session_id:
+                  type: integer
+                  example: 2
+                class_space_id:
+                  type: integer
+                  example: 1
+              required:
+              - class_session_id
+              - class_space_id
   "/api/v1/users":
     get:
       summary: list users

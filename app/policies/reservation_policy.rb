@@ -18,4 +18,12 @@ class ReservationPolicy < ApplicationPolicy
   def destroy?
     user&.admin? || record.user_id == user&.id
   end
+
+  def create_with_payment?
+    user.present?
+  end
+
+  def confirm_payment?
+    user.present?
+  end
 end

@@ -56,6 +56,23 @@ class Api::V1::ReservationsController < ApplicationController
     @reservation.destroy!
   end
 
+
+  def create_with_payment
+    authorize Reservation, :create_with_payment?
+    service = Reservations::CreateWithPaymentService.new(
+      class_session_id: params[:class_session_id],
+      user: @current_user,
+      class_space_id: params[:class_space_id]
+    )
+    result = service.call
+    if result[:success]
+      render json: { client_secret: result[:client_secret] }, status: :ok
+    else
+      render json: { error: result[:message] }, status: :unprocessable_entity
+    end
+  end
+
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_reservation

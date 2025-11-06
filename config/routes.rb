@@ -11,11 +11,21 @@ Rails.application.routes.draw do
       post "logout",        to: "auth#logout"        # opcional { refresh_token }
       post "logout_all",    to: "auth#logout_all"    # logout de todos los dispositivos
       post "cleanup_tokens", to: "auth#cleanup_tokens" # limpiar tokens expirados (solo admin)
+      post "stripe_webhooks", to: "stripe_webhooks#receive"
 
-      resources :reservations
+      resources :reservations do
+        collection do
+          post :create_with_payment
+        end
+      end
       resources :class_sessions do
         collection do
           post :create_recurring
+        end
+      end
+      resources :class_packages do
+        collection do
+          post :purchase_with_payment
         end
       end
       resources :lounges
@@ -25,6 +35,7 @@ Rails.application.routes.draw do
           get :injuries_by_user
         end
       end
+      resources :transactions, only: [ :index, :show ]
       resources :users do
         collection do
           post "validate_password_reset_token"
@@ -32,6 +43,7 @@ Rails.application.routes.draw do
           patch "reset_password"
         end
       end
+      resources :user_class_packages, only: [ :index, :show ]
     end
   end
 end
