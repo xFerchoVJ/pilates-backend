@@ -40,4 +40,10 @@ else
     cron: "0 * * * *", # Ejecutar cada hora
     class: "CleanupPastClassSessionsJob"
   )
+
+  Sidekiq::Cron::Job.create(
+    name: "Notify Upcoming Class Sessions",
+    cron: "*/10 * * * *", # Ejecutar cada 10 minutos
+    class: "NotificateClassSessionJob"
+  )
 end

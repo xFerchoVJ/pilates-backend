@@ -1,6 +1,6 @@
 class ReservationPolicy < ApplicationPolicy
   def index?
-    user&.admin? || user&.instructor?
+    user&.admin? || user&.instructor? || user&.user?
   end
 
   def show?

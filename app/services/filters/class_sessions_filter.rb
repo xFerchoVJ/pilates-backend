@@ -17,6 +17,9 @@ module Filters
       filtered = filtered.capacity_min(@params[:capacity_min]) if present?(:capacity_min)
       filtered = filtered.capacity_max(@params[:capacity_max]) if present?(:capacity_max)
       filtered = filtered.by_lounge(@params[:lounge_id]) if present?(:lounge_id)
+      filtered = filtered.price_min(@params[:price_min]) if present?(:price_min)
+      filtered = filtered.price_max(@params[:price_max]) if present?(:price_max)
+
       if present?(:date_from)
         date = parse_date(@params[:date_from])
         filtered = filtered.date_from(date) if date

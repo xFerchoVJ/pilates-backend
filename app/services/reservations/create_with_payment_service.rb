@@ -7,17 +7,15 @@ class Reservations::CreateWithPaymentService
   end
 
   def call
-    return failure("El id de la clase es requerido") if @class_session_id.blank?
-    return failure("El usuario es requerido") if @user.blank?
-    return failure("El espacio de clase es requerido") if @class_space_id.blank?
+    return validate_required_params unless valid_required_params?
 
-    class_session = ClassSession.find_by(id: @class_session_id)
-    return failure("La clase no fue encontrada") unless class_session
-    return failure("La clase no tiene espacios") if class_session.class_spaces.empty?
-    return failure("La clase no tiene espacios disponibles") if class_session.full?
+    class_session = find_class_session
+    validation_error = validate_class_session(class_session)
+    return validation_error if validation_error
 
-    class_space = class_session.class_spaces.find { |space| space.id == @class_space_id }
-    return failure("El espacio de clase no fue encontrada") unless class_space
+    class_space = find_class_space(class_session)
+    validation_error = validate_class_space(class_space)
+    return validation_error if validation_error
 
     active_package = @user.user_class_packages.active.first
 
@@ -28,6 +26,7 @@ class Reservations::CreateWithPaymentService
           class_session: class_session,
           class_space: class_space
         )
+        class_space.update!(status: :reserved)
         active_package.consume_class!
         Transaction.create!(
           user: @user,
@@ -68,6 +67,46 @@ class Reservations::CreateWithPaymentService
   end
 
   private
+
+  def validate_required_params
+    return log_and_fail("El id de la clase es requerido") if @class_session_id.blank?
+    return log_and_fail("El usuario es requerido") if @user.blank?
+    return log_and_fail("El espacio de clase es requerido") if @class_space_id.blank?
+
+    nil
+  end
+
+  def valid_required_params?
+    @class_session_id.present? && @user.present? && @class_space_id.present?
+  end
+
+  def find_class_session
+    ClassSession.find_by(id: @class_session_id)
+  end
+
+  def validate_class_session(class_session)
+    return log_and_fail("La clase no fue encontrada") if class_session.blank?
+    return log_and_fail("La clase no tiene espacios") if class_session.class_spaces.empty?
+    return log_and_fail("La clase no tiene espacios disponibles") if class_session.full?
+
+    nil
+  end
+
+  def find_class_space(class_session)
+    class_session.class_spaces.find { |space| space.id == @class_space_id }
+  end
+
+  def validate_class_space(class_space)
+    return log_and_fail("El espacio de clase no fue encontrado") if class_space.blank?
+    return log_and_fail("El espacio de clase no está disponible") unless class_space.available?
+
+    nil
+  end
+
+  def log_and_fail(message)
+    Rails.logger.error(message)
+    failure(message)
+  end
 
   def success(data)
     { success: true }.merge(data)

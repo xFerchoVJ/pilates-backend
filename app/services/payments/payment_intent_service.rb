@@ -11,7 +11,15 @@ class Payments::PaymentIntentService
 
   def call
     begin
-      transaction = Transaction.new(
+      # Crear el payment intent primero (sin transaction_id en metadata aún)
+      payment_intent = Stripe::PaymentIntent.create(
+        amount: (@amount * 100).to_i,
+        currency: @currency,
+        metadata: @metadata
+      )
+
+      # Crear la transacción con el payment_intent_id
+      transaction = Transaction.create!(
         user: @user,
         amount: @amount,
         currency: @currency,
@@ -19,18 +27,16 @@ class Payments::PaymentIntentService
         transaction_type: @transaction_type,
         reference: @reference,
         reference_type: @reference_type,
+        payment_intent_id: payment_intent.id
       )
 
-      payment_intent = Stripe::PaymentIntent.create(
-        amount: (@amount * 100).to_i,
-        currency: @currency,
+      # Actualizar el payment intent para agregar el transaction_id al metadata
+      Stripe::PaymentIntent.update(
+        payment_intent.id,
         metadata: @metadata.merge(
           { transaction_id: transaction.id }
         )
       )
-
-      transaction.payment_intent_id = payment_intent.id
-      transaction.save!
 
       success(client_secret: payment_intent.client_secret)
     rescue => e

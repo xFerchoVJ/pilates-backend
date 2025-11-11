@@ -3,6 +3,7 @@
   - default
   - critical
   - low
+  - notifications
 
 :schedule:
   cleanup_expired_tokens:

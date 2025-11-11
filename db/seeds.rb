@@ -6,56 +6,76 @@ User.destroy_all
 # Crear 5 usuarios, 1 admin, 1 instructor, 3 users
 users = 5.times.map do |i|
   User.create!(
-    email: "user#{i+1}@example.com",
-    password: "password",
+    email: Faker::Internet.email,
+    password: Faker::Internet.password,
     role: "user",
-    name: "User #{i+1}",
-    last_name: "User #{i+1}",
-    phone: "1234567890",
-    gender: "male",
-    birthdate: "1990-01-01"
+    name: Faker::Name.first_name,
+    last_name: Faker::Name.last_name,
+    phone: Faker::PhoneNumber.phone_number,
+    gender: User.genders.keys.sample,
+    birthdate: Faker::Date.birthday(min_age: 18, max_age: 65)
   )
 end
 
-admin = User.create!(
-  email: "admin@example.com",
-  password: "password",
+User.create!(
+  email: Faker::Internet.email,
+  password: "123456",
   role: "admin",
-  name: "Admin",
-  last_name: "Admin",
-  phone: "1234567890",
-  gender: "male",
-  birthdate: "1990-01-01"
+  name: Faker::Name.first_name,
+  last_name: Faker::Name.last_name,
+  phone: Faker::PhoneNumber.phone_number,
+  gender: User.genders.keys.sample,
+  birthdate: Faker::Date.birthday(min_age: 18, max_age: 65)
 )
 
 instructor = User.create!(
-  email: "instructor@example.com",
-  password: "password",
+  email: Faker::Internet.email,
+  password: "123456",
   role: "instructor",
-  name: "Instructor",
-  last_name: "Instructor",
-  phone: "1234567890",
-  gender: "male",
-  birthdate: "1990-01-01"
+  name: Faker::Name.first_name,
+  last_name: Faker::Name.last_name,
+  phone: Faker::PhoneNumber.phone_number,
+  gender: User.genders.keys.sample,
+  birthdate: Faker::Date.birthday(min_age: 18, max_age: 65)
 )
 # Crear lesiones para los usuarios
 users.each do |user|
   Injury.create!(
     user_id: user.id,
-    injury_type: "Lesión de rodilla",
-    description: "Dolor en la rodilla izquierda durante ejercicios de flexión",
-    severity: "moderada",
-    date_ocurred: "2024-01-15",
+    injury_type: Faker::Lorem.words(number: 2).join(" "),
+    description: Faker::Lorem.sentence,
+    severity: %w[leve moderada grave].sample,
+    date_ocurred: Faker::Date.birthday(min_age: 18, max_age: 65),
     recovered: false
   )
 end
 
+design = LoungeDesign.create!(
+  name: Faker::Lorem.words(number: 2).join(" "),
+  description: Faker::Lorem.sentence,
+  layout_json: {
+    "spaces" => Array.new(5) do |i|
+      {
+        "label" => (i + 1).to_s,
+        "x" => Faker::Number.between(from: 50, to: 400),
+        "y" => Faker::Number.between(from: 50, to: 400)
+      }
+    end
+  }
+)
+lounge = Lounge.create!(
+  name: Faker::Lorem.words(number: 2).join(" "),
+  description: Faker::Lorem.sentence,
+  lounge_design_id: design.id
+)
+
 # Crear clases para el instructor
 ClassSession.create!(
   instructor_id: instructor.id,
-  name: "Clase de Pilates",
-  description: "Clase de Pilates para principiantes",
-  start_time: "2024-01-15 10:00:00",
-  end_time: "2024-01-15 11:00:00",
-  capacity: 3
+  name: Faker::Lorem.words(number: 2).join(" "),
+  description: Faker::Lorem.sentence,
+  start_time: Faker::Time.between(from: Time.current, to: Time.current + 1.hour),
+  end_time: Faker::Time.between(from: Time.current + 1.hour, to: Time.current + 2.hours),
+  lounge_id: lounge.id,
+  price: Faker::Number.between(from: 100, to: 1000)
 )

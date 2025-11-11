@@ -6,6 +6,7 @@ FactoryBot.define do
     end_time { Faker::Time.between(from: start_time, to: start_time + 1.hour) }
     instructor { create(:user, role: 'instructor') }
     lounge { create(:lounge) }
+    price { Faker::Number.between(from: 100, to: 1000) }
     after(:create) do |class_session|
       class_session.lounge.lounge_design.layout_json["spaces"].each do |space|
         ClassSpace.create!(
