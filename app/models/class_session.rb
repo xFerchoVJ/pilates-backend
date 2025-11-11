@@ -35,6 +35,8 @@ class ClassSession < ApplicationRecord
   scope :date_to, ->(date) { where("start_time <= ?", date.end_of_day) }
   scope :upcoming, -> { where("end_time >= ?", Time.current) }
   scope :past, -> { where("end_time < ?", Time.current) }
+  scope :price_min, ->(min) { where("price >= ?", min.to_i) }
+  scope :price_max, ->(max) { where("price <= ?", max.to_i) }
 
   private
 

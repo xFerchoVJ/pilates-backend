@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_11_03_060556) do
+ActiveRecord::Schema[7.2].define(version: 2025_11_11_042202) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -84,6 +84,25 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_03_060556) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["class_session_id"], name: "index_class_spaces_on_class_session_id"
+  end
+
+  create_table "class_waitlist_notifications", force: :cascade do |t|
+    t.bigint "class_session_id", null: false
+    t.bigint "user_id", null: false
+    t.datetime "notified_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["class_session_id", "user_id"], name: "idx_on_class_session_id_user_id_b51f4eb9ca", unique: true
+    t.index ["class_session_id"], name: "index_class_waitlist_notifications_on_class_session_id"
+    t.index ["user_id"], name: "index_class_waitlist_notifications_on_user_id"
+  end
+
+  create_table "devices", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "expo_push_token"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_devices_on_user_id"
   end
 
   create_table "injuries", force: :cascade do |t|
@@ -191,6 +210,9 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_03_060556) do
   add_foreign_key "class_sessions", "lounges"
   add_foreign_key "class_sessions", "users", column: "instructor_id"
   add_foreign_key "class_spaces", "class_sessions"
+  add_foreign_key "class_waitlist_notifications", "class_sessions"
+  add_foreign_key "class_waitlist_notifications", "users"
+  add_foreign_key "devices", "users"
   add_foreign_key "injuries", "users"
   add_foreign_key "lounges", "lounge_designs"
   add_foreign_key "refresh_token_users", "users"

@@ -117,6 +117,10 @@ GEM
     erubi (1.13.1)
     et-orbi (1.4.0)
       tzinfo
+    ethon (0.15.0)
+      ffi (>= 1.15.0)
+    exponent-server-sdk (0.1.0)
+      typhoeus
     factory_bot (6.5.5)
       activesupport (>= 6.1.0)
     factory_bot_rails (6.5.1)
@@ -134,6 +138,9 @@ GEM
       multipart-post (~> 2.0)
     faraday-net_http (3.4.1)
       net-http (>= 0.5.0)
+    ffi (1.17.2-aarch64-linux-gnu)
+    ffi (1.17.2-arm64-darwin)
+    ffi (1.17.2-x86_64-linux-gnu)
     fugit (1.11.2)
       et-orbi (~> 1, >= 1.2.11)
       raabro (~> 1.4)
@@ -350,6 +357,8 @@ GEM
     stripe (17.1.0)
     thor (1.4.0)
     timeout (0.4.3)
+    typhoeus (1.5.0)
+      ethon (>= 0.9.0, < 0.16.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     unicode-display_width (3.1.5)
@@ -377,6 +386,7 @@ DEPENDENCIES
   cloudinary
   debug
   dotenv-rails (~> 2.1, >= 2.1.1)
+  exponent-server-sdk
   factory_bot_rails
   faker
   google-id-token (~> 1.4, >= 1.4.2)

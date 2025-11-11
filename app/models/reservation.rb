@@ -49,5 +49,19 @@ class Reservation < ApplicationRecord
   def mark_space_as_available
     return if class_space.nil?
     class_space.update!(status: :available)
+    notifications = ClassWaitlistNotification
+                      .where(class_session_id: class_session_id, notified_at: nil)
+    notifications.find_each do |entry|
+      tokens = entry.user.devices.pluck(:expo_push_token).compact
+      next if tokens.empty?
+
+      Notifications::PushNotificationsService.new(
+        tokens: tokens,
+        title: "¡Un lugar se liberó!",
+        body: "Hay un lugar disponible en #{class_session.name}. ¡Reserva antes de que se acabe!"
+      ).call
+
+      entry.update!(notified_at: Time.current)
+    end
   end
 end

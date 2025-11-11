@@ -202,6 +202,103 @@ paths:
                 class_package_id:
                   type: integer
         required: true
+  "/api/v1/devices":
+    get:
+      summary: list devices
+      tags:
+      - Devices
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: successful
+    post:
+      summary: create device
+      tags:
+      - Devices
+      security:
+      - bearerAuth: []
+      parameters: []
+      responses:
+        '201':
+          description: created
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: integer
+                expo_push_token:
+                  type: string
+              required:
+              - user_id
+              - expo_push_token
+        required: true
+  "/api/v1/devices/{id}":
+    get:
+      summary: show device
+      tags:
+      - Devices
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: device id
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: successful
+    patch:
+      summary: update device
+      tags:
+      - Devices
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: device id
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: successful
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                device:
+                  type: object
+                  properties:
+                    expo_push_token:
+                      type: string
+              required:
+              - device
+        required: true
+    delete:
+      summary: destroy device
+      tags:
+      - Devices
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: device id
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: no content
   "/api/v1/lounges_designs":
     get:
       summary: list lounges_designs

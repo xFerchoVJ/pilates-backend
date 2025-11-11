@@ -85,11 +85,11 @@ class Api::V1::ClassSessionsController < ApplicationController
     end
 
     def filter_params
-      params.permit(:instructor_id, :capacity_min, :capacity_max, :date_from, :date_to, :start_time_from, :start_time_to, :search, :lounge_id)
+      params.permit(:instructor_id, :capacity_min, :capacity_max, :date_from, :date_to, :start_time_from, :start_time_to, :search, :lounge_id, :price_min, :price_max)
     end
 
     # Only allow a list of trusted parameters through.
     def class_session_params
-      params.require(:class_session).permit(:name, :description, :start_time, :end_time, :instructor_id, :lounge_id)
+      params.require(:class_session).permit(:name, :description, :start_time, :end_time, :instructor_id, :lounge_id, :price)
     end
 end

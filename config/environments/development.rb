@@ -16,13 +16,10 @@ Rails.application.configure do
   config.server_timing = true
 
   # Caching
-  if Rails.root.join("tmp/caching-dev.txt").exist?
-    config.cache_store = :redis_cache_store, { url: "redis://localhost:6378/0" }
-    config.public_file_server.headers = { "Cache-Control" => "public, max-age=#{2.days.to_i}" }
-  else
-    config.action_controller.perform_caching = false
-    config.cache_store = :null_store
-  end
+  config.cache_store = :redis_cache_store, {
+    url: ENV.fetch("REDIS_URL") { "redis://localhost:6379/0" }, # fallback a localhost
+    expires_in: 90.minutes
+  }
 
   # Active Storage
   config.active_storage.service = :cloudinary
@@ -36,7 +33,7 @@ Rails.application.configure do
   port:                 587,
   user_name:            ENV["BREVO_USERNAME"], # suele ser tu email
   password:             ENV["BREVO_SMTP_KEY"],
-  authentication:       'plain',
+  authentication:       "plain",
   enable_starttls_auto: true
 }
 

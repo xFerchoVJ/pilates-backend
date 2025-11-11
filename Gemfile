@@ -65,3 +65,4 @@ gem "rswag-ui"
 gem "rswag-specs"
 gem 'rspec-rails', '~> 8.0.0'
 gem "stripe"
+gem 'exponent-server-sdk'

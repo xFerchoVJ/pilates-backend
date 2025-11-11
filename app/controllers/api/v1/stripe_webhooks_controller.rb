@@ -10,9 +10,27 @@ class Api::V1::StripeWebhooksController < ApplicationController
 
     case event.type
     when "payment_intent.succeeded"
+      Rails.logger.info "Payment intent succeeded: #{event.data.object.inspect}"
       handle_payment_intent_succeeded(event.data.object)
     when "payment_intent.payment_failed"
+      Rails.logger.info "Payment intent failed: #{event.data.object.inspect}"
       handle_payment_intent_failed(event.data.object)
+    when "charge.succeeded"
+      # Fallback: obtener el PaymentIntent desde el Charge
+      charge = event.data.object
+      payment_intent_id = charge.payment_intent
+      if payment_intent_id
+        payment_intent = Stripe::PaymentIntent.retrieve(payment_intent_id)
+        handle_payment_intent_succeeded(payment_intent)
+      end
+    when "charge.failed"
+      # Fallback: obtener el PaymentIntent desde el Charge
+      charge = event.data.object
+      payment_intent_id = charge.payment_intent
+      if payment_intent_id
+        payment_intent = Stripe::PaymentIntent.retrieve(payment_intent_id)
+        handle_payment_intent_failed(payment_intent)
+      end
     end
 
     render json: { status: "ok" }
@@ -29,8 +47,14 @@ class Api::V1::StripeWebhooksController < ApplicationController
   end
 
   def handle_payment_intent_succeeded(payment_intent)
+    Rails.logger.info "Handling payment intent succeeded: #{payment_intent.inspect}"
     transaction_id = payment_intent.metadata["transaction_id"]
-    transaction = Transaction.find_by(id: transaction_id)
+    transaction = if transaction_id
+      Transaction.find_by(id: transaction_id)
+    else
+      # Fallback: buscar por payment_intent_id si no hay metadata
+      Transaction.find_by(payment_intent_id: payment_intent.id)
+    end
     return unless transaction
     return if transaction.succeeded?
 
@@ -49,7 +73,14 @@ class Api::V1::StripeWebhooksController < ApplicationController
   end
 
   def handle_payment_intent_failed(payment_intent)
-    transaction = Transaction.find_by(id: payment_intent.metadata["transaction_id"])
+    Rails.logger.info "Handling payment intent failed: #{payment_intent.inspect}"
+    transaction_id = payment_intent.metadata["transaction_id"]
+    transaction = if transaction_id
+      Transaction.find_by(id: transaction_id)
+    else
+      # Fallback: buscar por payment_intent_id si no hay metadata
+      Transaction.find_by(payment_intent_id: payment_intent.id)
+    end
     return unless transaction
     return if transaction.failed?
 
@@ -62,7 +93,12 @@ class Api::V1::StripeWebhooksController < ApplicationController
       class_session_id: payment_intent.metadata["class_session_id"],
       class_space_id: payment_intent.metadata["class_space_id"]
     )
+    class_space = ClassSpace.find_by(id: payment_intent.metadata["class_space_id"])
+    class_space.update!(status: :reserved)
     transaction.update!(reference: reservation, reference_type: "Reservation")
+
+    # Enviar correo de confirmación de reserva
+    UserMailer.reservation_confirmation(reservation).deliver_later
   end
 
   # Ejemplo: para futuras expansiones
