@@ -202,6 +202,45 @@ paths:
                 class_package_id:
                   type: integer
         required: true
+  "/api/v1/class_waitlist_notifications":
+    post:
+      summary: create class_waitlist_notification
+      tags:
+      - ClassWaitlistNotifications
+      security:
+      - bearerAuth: []
+      parameters: []
+      responses:
+        '201':
+          description: created
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                class_session_id:
+                  type: integer
+              required:
+              - class_session_id
+        required: true
+  "/api/v1/class_waitlist_notifications/{id}":
+    delete:
+      summary: destroy class_waitlist_notification
+      tags:
+      - ClassWaitlistNotifications
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: class_waitlist_notification id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: no content
   "/api/v1/devices":
     get:
       summary: list devices

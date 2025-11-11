@@ -1,6 +1,6 @@
 class Api::V1::ClassWaitlistNotificationsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_class_session, only: %i[ create ]
+  before_action :set_class_session, only: %i[ create destroy ]
 
   # POST /class_waitlist_notifications
   def create
