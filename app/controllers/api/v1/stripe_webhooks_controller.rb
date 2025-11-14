@@ -98,7 +98,7 @@ class Api::V1::StripeWebhooksController < ApplicationController
     transaction.update!(reference: reservation, reference_type: "Reservation")
 
     # Enviar correo de confirmación de reserva
-    UserMailer.reservation_confirmation(reservation).deliver_later
+  
   end
 
   # Ejemplo: para futuras expansiones

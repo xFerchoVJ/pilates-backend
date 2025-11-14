@@ -1,5 +1,5 @@
 class Api::V1::ClassSessionSerializer < ActiveModel::Serializer
-  attributes :id, :name, :description, :start_time, :end_time, :spots_left, :users_for_class, :users_count_for_class
+  attributes :id, :name, :description, :start_time, :end_time, :spots_left, :users_for_class, :users_count_for_class, :price
   has_one :instructor, serializer: Api::V1::UsersSerializer
   belongs_to :lounge, serializer: Api::V1::LoungesSerializer
   has_many :class_spaces

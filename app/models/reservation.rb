@@ -10,7 +10,7 @@ class Reservation < ApplicationRecord
   validate :class_session_not_full
   validate :class_space_must_exist
 
-  before_create :mark_space_as_reserved
+  before_create :mark_space_as_reserved 
   after_destroy :mark_space_as_available
 
   private
@@ -44,6 +44,7 @@ class Reservation < ApplicationRecord
   def mark_space_as_reserved
     return if class_space.nil?
     class_space.update!(status: :reserved)
+    UserMailer.reservation_confirmation(self).deliver_later
   end
 
   def mark_space_as_available
