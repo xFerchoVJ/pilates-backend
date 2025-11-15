@@ -1,13 +1,14 @@
 class Api::V1::UserClassPackagesController < ApplicationController
   include Filterable
   before_action :set_user_class_package, only: %i[ show ]
+  before_action :authenticate_user!
 
   # GET /api/v1/user_class_packages
   def index
-    if current_user.admin?
+    if @current_user.admin?
       @user_class_packages = UserClassPackage.includes(:user, :class_package).order(:created_at)
     else
-      @user_class_packages = current_user.user_class_packages.includes(:class_package).order(:created_at)
+      @user_class_packages = @current_user.user_class_packages.includes(:class_package).order(:created_at)
     end
 
     # Apply filters via service

@@ -14,6 +14,7 @@ module Filters
 
       filtered = filtered.by_user(@params[:user_id]) if present?(:user_id)
       filtered = filtered.by_class_session(@params[:class_session_id]) if present?(:class_session_id)
+      filtered = filtered.active if present?(:active)
 
       if present?(:date_from)
         date = parse_date(@params[:date_from])

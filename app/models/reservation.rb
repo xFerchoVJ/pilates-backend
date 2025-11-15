@@ -13,6 +13,10 @@ class Reservation < ApplicationRecord
   before_create :mark_space_as_reserved 
   after_destroy :mark_space_as_available
 
+  scope :by_user, ->(user_id) { where(user_id: user_id) }
+  scope :by_class_session, ->(class_session_id) { where(class_session_id: class_session_id) }
+  scope :active, -> { where(status: true) }
+
   private
 
   def class_space_belongs_to_class_session

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_11_11_042202) do
+ActiveRecord::Schema[7.2].define(version: 2025_11_14_210546) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -153,6 +153,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_11_042202) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "class_space_id", null: false
+    t.boolean "status", default: true
     t.index ["class_session_id"], name: "index_reservations_on_class_session_id"
     t.index ["class_space_id"], name: "index_reservations_on_class_space_id"
     t.index ["user_id"], name: "index_reservations_on_user_id"

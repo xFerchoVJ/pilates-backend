@@ -80,11 +80,11 @@ class Api::V1::ReservationsController < ApplicationController
     end
 
     def filter_params
-      params.permit(:user_id, :class_session_id, :class_space_id, :date_from, :date_to)
+      params.permit(:user_id, :class_session_id, :class_space_id, :date_from, :date_to, :active)
     end
 
     # Only allow a list of trusted parameters through.
     def reservation_params
-      params.require(:reservation).permit(:user_id, :class_session_id, :class_space_id)
+      params.require(:reservation).permit(:user_id, :class_session_id, :class_space_id, :status)
     end
 end

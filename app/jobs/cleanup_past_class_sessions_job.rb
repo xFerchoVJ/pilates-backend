@@ -5,9 +5,11 @@ class CleanupPastClassSessionsJob
     # Eliminar clases que ya terminaron (end_time < ahora)
     # Usamos destroy_all para respetar las asociaciones (class_spaces, reservations)
     past_sessions = ClassSession.where("end_time < ?", Time.current)
+    puts "Past sessions: #{past_sessions.inspect}"
     deleted_count = 0
 
     past_sessions.find_each do |session|
+      # Eliminar la clase
       session.destroy
       deleted_count += 1
     rescue StandardError => e

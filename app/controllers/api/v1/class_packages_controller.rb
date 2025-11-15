@@ -1,7 +1,7 @@
 class Api::V1::ClassPackagesController < ApplicationController
   include Filterable
   before_action :set_class_package, only: %i[ show update destroy ]
-
+  before_action :authenticate_user!
   # GET /api/v1/class_packages
   def index
     @class_packages = ClassPackage.all

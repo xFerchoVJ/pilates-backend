@@ -1,7 +1,7 @@
 class Api::V1::TransactionsController < ApplicationController
   include Filterable
   before_action :set_transaction, only: [ :show ]
-
+  before_action :authenticate_user!
   def index
     @transactions = Transaction.includes(:user, :reference).order(:created_at)
 
