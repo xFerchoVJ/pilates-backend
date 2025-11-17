@@ -3,7 +3,11 @@ class Api::V1::TransactionsController < ApplicationController
   before_action :set_transaction, only: [ :show ]
   before_action :authenticate_user!
   def index
-    @transactions = Transaction.includes(:user, :reference).order(:created_at)
+    if @current_user.admin?
+      @transactions = Transaction.includes(:user, :reference).order(:created_at)
+    else
+      @transactions = @current_user.transactions.includes(:reference).order(:created_at)
+    end
 
     # Apply filters via service
     @transactions = ::Filters::TransactionsFilter.call(@transactions, filter_params)
