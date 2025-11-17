@@ -50,7 +50,9 @@ class Api::V1::UsersSerializer < ActiveModel::Serializer
       class_space_id: next_reservation.class_space_id,
       status: next_reservation.status,
       class_name: next_reservation.class_session.name,
-      instructor_name: instructor_full_name(next_reservation.class_session.instructor)
+      instructor_name: instructor_full_name(next_reservation.class_session.instructor),
+      start_time: next_reservation.class_session.start_time,
+      end_time: next_reservation.class_session.end_time
     }
   end
 
