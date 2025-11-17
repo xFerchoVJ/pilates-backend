@@ -17,7 +17,20 @@ class Api::V1::ClassSessionSerializer < ActiveModel::Serializer
   end
 
   def users_for_class
-    object.reservations.includes(:user).map { |reservation| Api::V1::UsersSerializer.new(reservation.user) }
+    object.reservations.includes(:user, :class_space).map do |reservation|
+      {
+        id: reservation.user.id,
+        name: reservation.user.name,
+        last_name: reservation.user.last_name,
+        email: reservation.user.email,
+        phone: reservation.user.phone,
+        class_space_id: reservation.class_space.id,
+        class_space_label: reservation.class_space.label,
+        class_space_x: reservation.class_space.x,
+        class_space_y: reservation.class_space.y,
+        status: reservation.status
+      }
+    end
   end
 
   def users_count_for_class

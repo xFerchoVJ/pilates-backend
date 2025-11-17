@@ -266,9 +266,10 @@ RSpec.describe 'api/v1/class_sessions', type: :request do
               start_time: { type: :string, example: '08:00' },
               end_time: { type: :string, example: '09:00' },
               instructor_id: { type: :integer },
-              lounge_id: { type: :integer }
+              lounge_id: { type: :integer },
+              price: { type: :integer, example: 100 }
             },
-            required: %i[name start_time end_time instructor_id lounge_id]
+            required: %i[name start_time end_time instructor_id lounge_id price]
           }
         },
         required: %i[start_date end_date days_of_week class_session]

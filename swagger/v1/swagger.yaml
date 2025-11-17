@@ -934,12 +934,16 @@ paths:
                       type: integer
                     lounge_id:
                       type: integer
+                    price:
+                      type: integer
+                      example: 100
                   required:
                   - name
                   - start_time
                   - end_time
                   - instructor_id
                   - lounge_id
+                  - price
               required:
               - start_date
               - end_date
