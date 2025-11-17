@@ -28,7 +28,8 @@ class Api::V1::ClassSessionSerializer < ActiveModel::Serializer
         class_space_label: reservation.class_space.label,
         class_space_x: reservation.class_space.x,
         class_space_y: reservation.class_space.y,
-        status: reservation.status
+        status: reservation.status,
+        injuries: reservation.user.injuries
       }
     end
   end
