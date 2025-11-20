@@ -32,6 +32,7 @@ Rails.application.routes.draw do
         collection { post :purchase_with_payment }
       end
       resources :class_waitlist_notifications, only: [ :create, :destroy ]
+      resources :class_credits, only: [ :index, :show ]
       resources :devices
       resources :lounges
       resources :lounges_designs
