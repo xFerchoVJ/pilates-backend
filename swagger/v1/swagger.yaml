@@ -813,6 +813,16 @@ paths:
       responses:
         '200':
           description: successful
+  "/api/v1/me":
+    get:
+      summary: me auth
+      tags:
+      - Auth
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: successful
   "/api/v1/class_sessions":
     get:
       summary: list class_sessions

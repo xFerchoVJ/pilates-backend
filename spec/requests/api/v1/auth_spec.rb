@@ -284,4 +284,26 @@ RSpec.describe 'api/v1/auth', type: :request do
       end
     end
   end
+
+  path '/api/v1/me' do
+    get('me auth') do
+      tags 'Auth'
+      produces 'application/json'
+      security [ bearerAuth: [] ]
+
+      response(200, 'successful') do
+        let!(:user) { create(:user) }
+
+        after do |example|
+          example.metadata[:response][:content] = {
+            'application/json' => {
+              example: JSON.parse(response.body, symbolize_names: true)
+            }
+          }
+        end
+
+        run_test!
+      end
+    end
+  end
 end

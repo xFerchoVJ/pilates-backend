@@ -21,6 +21,7 @@ Rails.application.routes.draw do
       post "google",   to: "auth#google"
       post "refresh",  to: "auth#refresh"
       post "logout",   to: "auth#logout"
+      get "me",        to: "auth#me"
       post "logout_all", to: "auth#logout_all"
       post "cleanup_tokens", to: "auth#cleanup_tokens"
       post "stripe_webhooks", to: "stripe_webhooks#receive"

@@ -1,6 +1,7 @@
 class Api::V1::AuthController < ApplicationController
   # No exige token para estas
   skip_before_action :set_current_user, only: %i[signup login google]
+  before_action :authenticate_user!, only: %i[me]
   # signup (local), login (local), login con google (id_token), refresh, logout
 
   def signup
@@ -107,6 +108,10 @@ class Api::V1::AuthController < ApplicationController
     CleanupExpiredTokensJob.perform_async
 
     render json: { message: "Limpieza de tokens programada" }
+  end
+
+  def me
+    render json: @current_user, serializer: Api::V1::UsersSerializer
   end
 
   private
