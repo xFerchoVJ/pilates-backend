@@ -25,9 +25,6 @@ Rails.application.routes.draw do
       post "cleanup_tokens", to: "auth#cleanup_tokens"
       post "stripe_webhooks", to: "stripe_webhooks#receive"
 
-      resources :reservations do
-        collection { post :create_with_payment }
-      end
       resources :class_sessions do
         collection { post :create_recurring }
       end
@@ -40,6 +37,9 @@ Rails.application.routes.draw do
       resources :lounges_designs
       resources :injuries do
         collection { get :injuries_by_user }
+      end
+      resources :reservations do
+        collection { post :create_with_payment }
       end
       resources :transactions, only: [ :index, :show ]
       resources :users do

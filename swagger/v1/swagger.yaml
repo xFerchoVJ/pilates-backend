@@ -12,6 +12,69 @@ components:
 security:
 - bearerAuth: []
 paths:
+  "/api/v1/class_credits":
+    get:
+      summary: list class_credits
+      tags:
+      - ClassCredits
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: page
+        in: query
+        description: page number
+        schema:
+          type: integer
+      - name: per_page
+        in: query
+        description: number of items per page
+        schema:
+          type: integer
+      - name: user_id
+        in: query
+        description: user id
+        schema:
+          type: string
+      - name: reservation_id
+        in: query
+        description: reservation id
+        schema:
+          type: string
+      - name: status
+        in: query
+        description: status
+        schema:
+          type: string
+      - name: used_from
+        in: query
+        description: used from
+        schema:
+          type: string
+      - name: used_to
+        in: query
+        description: used to
+        schema:
+          type: string
+      responses:
+        '200':
+          description: successful
+  "/api/v1/class_credits/{id}":
+    get:
+      summary: show class_credit
+      tags:
+      - ClassCredits
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: class_credit id
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: successful
   "/api/v1/class_packages":
     get:
       summary: list class_packages
@@ -66,6 +129,14 @@ paths:
         schema:
           type: string
           format: date
+      - name: unlimited
+        in: query
+        schema:
+          type: boolean
+      - name: limited
+        in: query
+        schema:
+          type: boolean
       responses:
         '200':
           description: successful

@@ -79,11 +79,11 @@ class Api::V1::ClassPackagesController < ApplicationController
     end
 
     def filter_params
-      params.permit(:search, :status, :currency, :price_min, :price_max, :class_count_min, :class_count_max, :date_from, :date_to)
+      params.permit(:search, :status, :currency, :price_min, :price_max, :class_count_min, :class_count_max, :date_from, :date_to, :unlimited, :limited)
     end
 
     # Only allow a list of trusted parameters through.
     def class_package_params
-      params.require(:class_package).permit(:name, :description, :class_count, :price, :currency, :status)
+      params.require(:class_package).permit(:name, :description, :class_count, :price, :currency, :status, :unlimited, :expires_in_days, :daily_limit)
     end
 end

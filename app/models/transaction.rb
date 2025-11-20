@@ -18,7 +18,8 @@ class Transaction < ApplicationRecord
   enum transaction_type: {
     class_payment: "class_payment",
     package_purchase: "package_purchase",
-    class_redeemed: "class_redeemed"
+    class_redeemed: "class_redeemed",
+    class_credit_used: "class_credit_used"
   }
 
   # Query scopes for filtering

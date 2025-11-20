@@ -3,7 +3,10 @@ class ClassPackage < ApplicationRecord
 
   validates :name, :class_count, :price, :currency, presence: true
   validates :price, numericality: { greater_than: 0 }
-  validates :class_count, numericality: { greater_than: 0 }
+
+  validates :class_count, numericality: { greater_than: 0 }, unless: :unlimited?
+
+  validate :unlimited_must_have_expiration
 
   scope :active, -> { where(status: true) }
   scope :inactive, -> { where(status: false) }
@@ -22,4 +25,16 @@ class ClassPackage < ApplicationRecord
   scope :class_count_max, ->(max) { where("class_count <= ?", max.to_i) }
   scope :created_from, ->(date) { where("created_at >= ?", date.beginning_of_day) }
   scope :created_to, ->(date) { where("created_at <= ?", date.end_of_day) }
+  scope :unlimited, -> { where(unlimited: true) }
+  scope :limited, -> { where(unlimited: false) }
+
+  def unlimited_must_have_expiration
+    if unlimited? && expires_in_days.blank?
+      errors.add(:expires_in_days, "debe tener una fecha de expiración")
+    end
+
+    if unlimited? && daily_limit.blank?
+      errors.add(:daily_limit, "debe de tener un límite diario de clases")
+    end
+  end
 end

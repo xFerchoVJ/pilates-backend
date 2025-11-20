@@ -19,6 +19,8 @@ module Filters
       filtered = filtered.price_max(@params[:price_max]) if present?(:price_max)
       filtered = filtered.class_count_min(@params[:class_count_min]) if present?(:class_count_min)
       filtered = filtered.class_count_max(@params[:class_count_max]) if present?(:class_count_max)
+      filtered = filtered.unlimited(@params[:unlimited]) if present?(:unlimited)
+      filtered = filtered.limited(@params[:limited]) if present?(:limited)
 
       if present?(:date_from)
         date = parse_date(@params[:date_from])
@@ -47,4 +49,3 @@ module Filters
     end
   end
 end
-

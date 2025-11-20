@@ -18,6 +18,8 @@ RSpec.describe 'Api::V1::ClassPackages', type: :request do
       parameter name: :class_count_max, in: :query, schema: { type: :integer }
       parameter name: :created_from, in: :query, schema: { type: :string, format: :date }
       parameter name: :created_to, in: :query, schema: { type: :string, format: :date }
+      parameter name: :unlimited, in: :query, schema: { type: :boolean }
+      parameter name: :limited, in: :query, schema: { type: :boolean }
 
       response(200, 'successful') do
         let!(:class_packages) { create_list(:class_package, 3) }

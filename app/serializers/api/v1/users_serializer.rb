@@ -6,6 +6,8 @@ class Api::V1::UsersSerializer < ActiveModel::Serializer
   has_many :reservations
   has_many :transactions
   has_many :devices
+  has_many :class_credits
+  has_many :class_waitlist_notifications
 
   def profile_picture_url
     object.profile_picture.attached? ? object.profile_picture.url : nil

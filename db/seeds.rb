@@ -13,12 +13,13 @@ users = 5.times.map do |i|
     last_name: Faker::Name.last_name,
     phone: Faker::PhoneNumber.phone_number,
     gender: User.genders.keys.sample,
-    birthdate: Faker::Date.birthday(min_age: 18, max_age: 65)
+    birthdate: Faker::Date.birthday(min_age: 18, max_age: 65),
+    has_injuries: User.has_injuries.keys.sample
   )
 end
 
 User.create!(
-  email: Faker::Internet.email,
+  email: "admin@example.com",
   password: "123456",
   role: "admin",
   name: Faker::Name.first_name,
@@ -38,10 +39,11 @@ instructor = User.create!(
   gender: User.genders.keys.sample,
   birthdate: Faker::Date.birthday(min_age: 18, max_age: 65)
 )
-# Crear lesiones para los usuarios
+# Crear lesiones para los usuarios que su status es yes
 users.each do |user|
+  next if user.has_injuries != "yes"
   Injury.create!(
-    user_id: user.id,
+    user: user,
     injury_type: Faker::Lorem.words(number: 2).join(" "),
     description: Faker::Lorem.sentence,
     severity: %w[leve moderada grave].sample,
@@ -69,13 +71,71 @@ lounge = Lounge.create!(
   lounge_design_id: design.id
 )
 
-# Crear clases para el instructor
-ClassSession.create!(
-  instructor_id: instructor.id,
-  name: Faker::Lorem.words(number: 2).join(" "),
-  description: Faker::Lorem.sentence,
-  start_time: Faker::Time.between(from: Time.current, to: Time.current + 1.hour),
-  end_time: Faker::Time.between(from: Time.current + 1.hour, to: Time.current + 2.hours),
-  lounge_id: lounge.id,
-  price: Faker::Number.between(from: 100, to: 1000)
-)
+# Crear clases
+5.times.each do |i|
+  ClassSession.create!(
+    instructor_id: instructor.id,
+    name: Faker::Lorem.words(number: 2).join(" "),
+    description: Faker::Lorem.sentence,
+    start_time: Faker::Time.between(from: Time.current, to: Time.current + 1.hour),
+    end_time: Faker::Time.between(from: Time.current + 1.hour, to: Time.current + 2.hours),
+    lounge_id: lounge.id,
+    price: Faker::Number.between(from: 100, to: 1000)
+  )
+end
+
+# Crear espacios para las clases
+ClassSession.all.each do |class_session|
+  ClassSpace.create!(
+    class_session: class_session,
+    label: Faker::Lorem.words(number: 2).join(" "),
+    x: Faker::Number.between(from: 50, to: 400),
+    y: Faker::Number.between(from: 50, to: 400)
+  )
+end
+
+# Crear paquete de clases
+5.times.each do |i|
+  unlimited = Faker::Boolean.boolean
+  expires_in_days = unlimited ? Faker::Number.between(from: 1, to: 30) : nil
+  daily_limit = unlimited ? Faker::Number.between(from: 1, to: 10) : nil
+  ClassPackage.create!(
+    name: Faker::Lorem.words(number: 2).join(" "),
+    description: Faker::Lorem.sentence,
+    class_count: unlimited ? 0 : Faker::Number.between(from: 10, to: 100),
+    price: Faker::Number.between(from: 100, to: 1000),
+    currency: "mxn",
+    status: true,
+    unlimited: unlimited,
+    expires_in_days: expires_in_days,
+    daily_limit: daily_limit
+  )
+end
+
+# Asignar aleatoriamente un paquete de clases a los usuarios
+users.each do |user|
+  class_package = ClassPackage.all.sample
+  expires_at = class_package.expires_in_days ? class_package.expires_in_days.days.from_now : nil
+  UserClassPackage.create!(
+    user: user,
+    class_package: class_package,
+    remaining_classes: class_package.class_count,
+    purchased_at: Time.current,
+    status: "active",
+    expires_at: expires_at
+  )
+end
+
+# Crear reservas para los usuarios
+users.each do |user|
+  ClassSession.all.each do |class_session|
+    next if Reservation.exists?(user: user, class_session: class_session)
+    class_space = ClassSpace.where(class_session: class_session, status: :available).sample
+    next if class_space.nil?
+    Reservation.create!(
+      user: user,
+      class_session: class_session,
+      class_space: class_space
+    )
+  end
+end

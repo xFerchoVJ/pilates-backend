@@ -18,6 +18,7 @@ class UserClassPackage < ApplicationRecord
   scope :created_to, ->(date) { where("created_at <= ?", date.end_of_day) }
 
   def consume_class!
+    return if class_package.unlimited?
     decrement!(:remaining_classes)
     update!(status: "completed") if remaining_classes.zero?
   end

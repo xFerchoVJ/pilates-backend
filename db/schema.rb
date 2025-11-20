@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_11_14_210546) do
+ActiveRecord::Schema[7.2].define(version: 2025_11_19_043455) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -50,6 +50,17 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_14_210546) do
     t.index ["jti"], name: "index_blacklisted_tokens_on_jti", unique: true
   end
 
+  create_table "class_credits", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "reservation_id", null: false
+    t.string "status", default: "unused"
+    t.datetime "used_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["reservation_id"], name: "index_class_credits_on_reservation_id"
+    t.index ["user_id"], name: "index_class_credits_on_user_id"
+  end
+
   create_table "class_packages", force: :cascade do |t|
     t.string "name", null: false
     t.text "description"
@@ -59,6 +70,9 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_14_210546) do
     t.boolean "status", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "unlimited", default: false, null: false
+    t.integer "expires_in_days"
+    t.integer "daily_limit"
   end
 
   create_table "class_sessions", force: :cascade do |t|
@@ -182,6 +196,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_14_210546) do
     t.datetime "purchased_at", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "expires_at"
     t.index ["class_package_id"], name: "index_user_class_packages_on_class_package_id"
     t.index ["user_id"], name: "index_user_class_packages_on_user_id"
   end
@@ -208,6 +223,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_14_210546) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "class_credits", "reservations"
+  add_foreign_key "class_credits", "users"
   add_foreign_key "class_sessions", "lounges"
   add_foreign_key "class_sessions", "users", column: "instructor_id"
   add_foreign_key "class_spaces", "class_sessions"

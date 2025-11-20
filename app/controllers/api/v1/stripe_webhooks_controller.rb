@@ -98,7 +98,6 @@ class Api::V1::StripeWebhooksController < ApplicationController
     transaction.update!(reference: reservation, reference_type: "Reservation")
 
     # Enviar correo de confirmación de reserva
-  
   end
 
   # Ejemplo: para futuras expansiones
@@ -116,9 +115,10 @@ class Api::V1::StripeWebhooksController < ApplicationController
     UserClassPackage.create!(
       user: user,
       class_package: class_package,
-      remaining_classes: class_package.class_count,
+      remaining_classes: class_package.unlimited? ? nil : class_package.class_count,
       purchased_at: Time.current,
-      status: "active"
+      status: "active",
+      expires_at: class_package.unlimited? ? Time.current + class_package.expires_in_days.days : nil
     )
   end
 end
