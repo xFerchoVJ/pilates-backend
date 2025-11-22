@@ -136,7 +136,7 @@ class Reservations::CreateWithPaymentService
   end
 
   def create_payment_intent
-    amount_cents = @final_amount || (@class_session.price.to_d * 100).to_i
+    amount_cents = @final_amount.to_i > 0 ? @final_amount.to_i : (@class_session.price.to_d * 100).to_i
     service = Payments::PaymentIntentService.new(
       user: @user,
       amount: amount_cents,
@@ -193,7 +193,7 @@ class Reservations::CreateWithPaymentService
   end
 
   def apply_coupon_if_any
-    return success(client_secret: nil) unless @coupon_code.present?
+    return success({}) unless @coupon_code.present?
 
     result = Coupons::ValidateAndApplyService.new(
       coupon_code: @coupon_code,
@@ -210,7 +210,7 @@ class Reservations::CreateWithPaymentService
     @discount_amount = result[:discount_cents]
     @final_amount = result[:final_amount_cents]
 
-    success(client_secret: nil)
+    success({})
   end
 
   def success(data)
