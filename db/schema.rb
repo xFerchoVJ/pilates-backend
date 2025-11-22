@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_11_19_043455) do
+ActiveRecord::Schema[7.2].define(version: 2025_11_22_215105) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -109,6 +109,38 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_19_043455) do
     t.index ["class_session_id", "user_id"], name: "idx_on_class_session_id_user_id_b51f4eb9ca", unique: true
     t.index ["class_session_id"], name: "index_class_waitlist_notifications_on_class_session_id"
     t.index ["user_id"], name: "index_class_waitlist_notifications_on_user_id"
+  end
+
+  create_table "coupon_usages", force: :cascade do |t|
+    t.bigint "coupon_id", null: false
+    t.bigint "user_id", null: false
+    t.bigint "reservation_id", null: false
+    t.bigint "transaction_id", null: false
+    t.jsonb "metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["coupon_id", "user_id"], name: "index_coupon_usages_on_coupon_id_and_user_id"
+    t.index ["coupon_id"], name: "index_coupon_usages_on_coupon_id"
+    t.index ["reservation_id"], name: "index_coupon_usages_on_reservation_id"
+    t.index ["transaction_id"], name: "index_coupon_usages_on_transaction_id"
+    t.index ["user_id"], name: "index_coupon_usages_on_user_id"
+  end
+
+  create_table "coupons", force: :cascade do |t|
+    t.string "code", null: false
+    t.string "discount_type", default: "percentage", null: false
+    t.string "discount_value", null: false
+    t.integer "usage_limit"
+    t.integer "usage_limit_per_user"
+    t.boolean "only_new_users", default: false
+    t.boolean "active", default: true
+    t.datetime "starts_at"
+    t.datetime "ends_at"
+    t.jsonb "metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "times_used"
+    t.index ["code"], name: "index_coupons_on_code", unique: true
   end
 
   create_table "devices", force: :cascade do |t|
@@ -230,6 +262,10 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_19_043455) do
   add_foreign_key "class_spaces", "class_sessions"
   add_foreign_key "class_waitlist_notifications", "class_sessions"
   add_foreign_key "class_waitlist_notifications", "users"
+  add_foreign_key "coupon_usages", "coupons"
+  add_foreign_key "coupon_usages", "reservations"
+  add_foreign_key "coupon_usages", "transactions"
+  add_foreign_key "coupon_usages", "users"
   add_foreign_key "devices", "users"
   add_foreign_key "injuries", "users"
   add_foreign_key "lounges", "lounge_designs"

@@ -312,6 +312,192 @@ paths:
       responses:
         '204':
           description: no content
+  "/api/v1/coupons":
+    get:
+      summary: list coupons
+      tags:
+      - Coupons
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+      - name: per_page
+        in: query
+        schema:
+          type: integer
+      - name: search
+        in: query
+        schema:
+          type: string
+      - name: only_new_users
+        in: query
+        schema:
+          type: boolean
+      - name: active_now
+        in: query
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: successful
+    post:
+      summary: create coupon
+      tags:
+      - Coupons
+      security:
+      - bearerAuth: []
+      parameters: []
+      responses:
+        '201':
+          description: created
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                coupon:
+                  type: object
+                  properties:
+                    code:
+                      type: string
+                    discount_type:
+                      type: string
+                      enum:
+                      - percentage
+                      - fixed
+                    discount_value:
+                      type: integer
+                    usage_limit:
+                      type: integer
+                    usage_limit_per_user:
+                      type: integer
+                    only_new_users:
+                      type: boolean
+                    active:
+                      type: boolean
+                    starts_at:
+                      type: string
+                      format: date
+                    ends_at:
+                      type: string
+                      format: date
+                    metadata:
+                      type: object
+                  required:
+                  - code
+                  - discount_type
+                  - discount_value
+                  - usage_limit
+                  - usage_limit_per_user
+                  - only_new_users
+                  - active
+                  - starts_at
+                  - ends_at
+                  - metadata
+        required: true
+  "/api/v1/coupons/{id}":
+    get:
+      summary: show coupon
+      tags:
+      - Coupons
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: coupon id
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: successful
+    patch:
+      summary: update coupon
+      tags:
+      - Coupons
+      security:
+      - bearerAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: successful
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                coupon:
+                  type: object
+                  properties:
+                    code:
+                      type: string
+                    discount_type:
+                      type: string
+                      enum:
+                      - percentage
+                      - fixed
+                    discount_value:
+                      type: integer
+                    usage_limit:
+                      type: integer
+                    usage_limit_per_user:
+                      type: integer
+                    only_new_users:
+                      type: boolean
+                    active:
+                      type: boolean
+                    starts_at:
+                      type: string
+                      format: date
+                    ends_at:
+                      type: string
+                      format: date
+                    metadata:
+                      type: object
+        required: true
+    delete:
+      summary: destroy coupon
+      tags:
+      - Coupons
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: coupon id
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: no content
+  "/api/v1/coupons/validate":
+    post:
+      summary: validate coupon
+      tags:
+      - Coupons
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: coupon_code
+        in: query
+        description: coupon code
+        schema:
+          type: string
+      - name: price_cents
+        in: query
+        description: price cents
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: successful
   "/api/v1/devices":
     get:
       summary: list devices

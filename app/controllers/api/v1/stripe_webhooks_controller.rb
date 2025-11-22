@@ -97,7 +97,25 @@ class Api::V1::StripeWebhooksController < ApplicationController
     class_space.update!(status: :reserved)
     transaction.update!(reference: reservation, reference_type: "Reservation")
 
-    # Enviar correo de confirmación de reserva
+    if payment_intent.metadata["coupon_code"].present?
+      coupon = Coupon.find_by(code: payment_intent.metadata["coupon_code"])
+      if coupon
+        service = Coupons::FinalizeUsageService.new(
+          coupon: coupon,
+          user: transaction.user,
+          transaction: transaction,
+          reservation: reservation
+        )
+
+        result = service.call
+
+        unless result[:success]
+          Rails.logger.error "Error al finalizar uso del cupón: #{result[:message]}"
+        end
+      end
+    end
+  rescue => e
+    Rails.logger.error "Error al crear la reserva desde pago: #{e.message}"
   end
 
   # Ejemplo: para futuras expansiones

@@ -34,6 +34,9 @@ Rails.application.routes.draw do
       end
       resources :class_waitlist_notifications, only: [ :create, :destroy ]
       resources :class_credits, only: [ :index, :show ]
+      resources :coupons do
+        collection { post :validate }
+      end
       resources :devices
       resources :lounges
       resources :lounges_designs

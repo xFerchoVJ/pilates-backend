@@ -139,3 +139,16 @@ users.each do |user|
     )
   end
 end
+
+# Crear cupones
+5.times.each do |i|
+  Coupon.create!(
+    code: Faker::Alphanumeric.alphanumeric(number: 10).upcase,
+    discount_type: Coupon.discount_types.keys.sample,
+    discount_value: Faker::Number.between(from: 1, to: 100),
+    usage_limit: Faker::Number.between(from: 1, to: 100),
+    usage_limit_per_user: Faker::Number.between(from: 1, to: 100),
+    only_new_users: Faker::Boolean.boolean,
+    active: Faker::Boolean.boolean
+  )
+end

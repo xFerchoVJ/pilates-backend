@@ -56,13 +56,14 @@ class Api::V1::ReservationsController < ApplicationController
     @reservation.destroy!
   end
 
-
+  # POST /reservations/create_with_payment
   def create_with_payment
     authorize Reservation, :create_with_payment?
     service = Reservations::CreateWithPaymentService.new(
       class_session_id: params[:class_session_id],
       user: @current_user,
-      class_space_id: params[:class_space_id]
+      class_space_id: params[:class_space_id],
+      coupon_code: params[:coupon_code] || nil
     )
     result = service.call
     if result[:success]

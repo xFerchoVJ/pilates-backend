@@ -1,8 +1,13 @@
 class Reservations::CreateWithPaymentService
-  def initialize(class_session_id:, user:, class_space_id:)
+  def initialize(class_session_id:, user:, class_space_id:, coupon_code: nil)
     @class_session_id = class_session_id
     @user = user
     @class_space_id = class_space_id
+    @coupon_code = coupon_code&.to_s&.strip
+
+    @discount_amount = 0
+    @final_amount = 0
+    @coupon = nil
   end
 
   def call
@@ -20,6 +25,9 @@ class Reservations::CreateWithPaymentService
     return reserve_with_credit if available_credit?
 
     return reserve_with_package if available_package?
+
+    apply_coupon_result = apply_coupon_if_any
+    return apply_coupon_result unless apply_coupon_result[:success]
 
     create_payment_intent
   end
@@ -128,9 +136,10 @@ class Reservations::CreateWithPaymentService
   end
 
   def create_payment_intent
+    amount_cents = @final_amount || (@class_session.price.to_d * 100).to_i
     service = Payments::PaymentIntentService.new(
       user: @user,
-      amount: @class_session.price,
+      amount: amount_cents,
       currency: "mxn",
       transaction_type: Transaction.transaction_types[:class_payment],
       reference: @class_session,
@@ -138,7 +147,9 @@ class Reservations::CreateWithPaymentService
       metadata: {
         user_id: @user.id,
         class_session_id: @class_session.id,
-        class_space_id: @class_space_id
+        class_space_id: @class_space_id,
+        coupon_code: @coupon&.code || nil,
+        discount_cents: @discount_amount || 0
       }
     )
 
@@ -179,6 +190,27 @@ class Reservations::CreateWithPaymentService
       status: :succeeded,
       payment_intent_id: "#{@user.email}-#{reservation.id}-#{Time.current.to_i}"
     )
+  end
+
+  def apply_coupon_if_any
+    return success(client_secret: nil) unless @coupon_code.present?
+
+    result = Coupons::ValidateAndApplyService.new(
+      coupon_code: @coupon_code,
+      price_cents: (@class_session.price.to_d * 100).to_i,
+      user: @user,
+      context: { class_session_id: @class_session.id }
+    ).call
+
+    unless result[:success]
+      return failure(result[:message])
+    end
+
+    @coupon = result[:coupon]
+    @discount_amount = result[:discount_cents]
+    @final_amount = result[:final_amount_cents]
+
+    success(client_secret: nil)
   end
 
   def success(data)
