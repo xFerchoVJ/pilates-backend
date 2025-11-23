@@ -12,7 +12,7 @@ class ClassPackages::PurchaseWithPaymentService
     failure("El paquete de clase no fue encontrado") unless @class_package
     service = Payments::PaymentIntentService.new(
       user: @user,
-      amount: @class_package.price,
+      amount: (@class_package.price * 100).to_i,
       currency: "mxn",
       transaction_type: "package_purchase",
       reference: @class_package,
