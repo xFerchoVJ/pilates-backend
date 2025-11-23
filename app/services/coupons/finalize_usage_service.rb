@@ -12,13 +12,13 @@ class Coupons::FinalizeUsageService
     return failure("No cupón") unless @coupon
     return failure("No se encontró el cupón") unless @coupon.persisted?
 
-    existing = CouponUsage.where(coupon: @coupon, transaction: @transaction).first
+    existing = CouponUsage.where(coupon: @coupon, payment_transaction: @transaction).first
     return failure("El cupón ya ha sido usado") if existing.present?
 
     CouponUsage.create!(
       coupon: @coupon,
       user: @user,
-      transaction: @transaction,
+      payment_transaction: @transaction,
       reservation: @reservation,
       metadata: @metadata
     )

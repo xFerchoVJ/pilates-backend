@@ -6,6 +6,7 @@ class Api::V1::AuthController < ApplicationController
 
   def signup
     user = User.new(user_params.merge(provider: nil))
+    user.role = :user
     if user.save
       render json: token_bundle_for(user), status: :created
     else
@@ -138,7 +139,7 @@ class Api::V1::AuthController < ApplicationController
   end
 
   def user_params
-    params.require(:user).permit(:email, :password, :name, :last_name, :phone, :role, :gender, :birthdate)
+    params.require(:user).permit(:email, :password, :name, :last_name, :phone, :gender, :birthdate)
           .tap { |p| p[:email] = p[:email].to_s.downcase if p[:email] }
   end
 end
