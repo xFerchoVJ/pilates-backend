@@ -29,6 +29,7 @@ class ClassPackage < ApplicationRecord
   scope :limited, -> { where(unlimited: false) }
 
   def unlimited_must_have_expiration
+    Rails.logger.info("unlimited? #{unlimited?}")
     if unlimited? && expires_in_days.blank?
       errors.add(:expires_in_days, "debe tener una fecha de expiración")
     end
