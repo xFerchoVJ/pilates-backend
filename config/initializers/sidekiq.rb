@@ -46,4 +46,10 @@ else
     cron: "*/10 * * * *", # Ejecutar cada 10 minutos
     class: "NotificateClassSessionJob"
   )
+
+  Sidekiq::Cron::Job.create(
+    name: "Deactive Past Class Packages",
+    cron: "0 2 * * *", # Ejecutar diariamente a las 2 AM
+    class: "DeactivePastClassPackagesJob"
+  )
 end

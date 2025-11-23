@@ -12,3 +12,6 @@
   cleanup_past_class_sessions:
     class: CleanupPastClassSessionsJob
     cron: '0 * * * *' # Cada hora
+  deactive_past_class_packages:
+    class: DeactivePastClassPackagesJob
+    cron: '0 2 * * *' # Diariamente a las 2 AM
