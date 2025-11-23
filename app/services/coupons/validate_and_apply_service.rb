@@ -25,13 +25,13 @@ class Coupons::ValidateAndApplyService
     end
 
     if coupon.usage_limit.present? && coupon.times_used >= coupon.usage_limit
-      failure("El cupón ha alcanzado su límite de uso")
+      return failure("El cupón ha alcanzado su límite de uso")
     end
 
     if coupon.usage_limit_per_user.present? && @user.present?
-      used_by_user = coupon.coupon.usages.where(user_id: @user.id).count
+      used_by_user = coupon.coupon_usages.where(user_id: @user.id).count
       if used_by_user >= coupon.usage_limit_per_user
-        failure("Ya has usado este cupón el número máximo de veces")
+        return failure("Ya has usado este cupón el número máximo de veces")
       end
     end
 

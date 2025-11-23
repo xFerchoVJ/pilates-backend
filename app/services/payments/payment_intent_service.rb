@@ -13,7 +13,7 @@ class Payments::PaymentIntentService
     begin
       # Crear el payment intent primero (sin transaction_id en metadata aún)
       payment_intent = Stripe::PaymentIntent.create(
-        amount: (@amount * 100).to_i,
+        amount: @amount,
         currency: @currency,
         metadata: @metadata
       )

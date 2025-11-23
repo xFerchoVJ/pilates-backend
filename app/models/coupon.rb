@@ -12,18 +12,31 @@ class Coupon < ApplicationRecord
   scope :by_only_new_users, ->(only_new_users) { where(only_new_users: only_new_users) }
 
   def usable_for?(user: nil)
-    return false unless active
-    return false if starts_at.present? && Time.current < starts_at
-    return false if ends_at.present? && Time.current > ends_at
-
+    unless active
+      Rails.logger.error "Coupon #{code} is not active"
+      return false
+    end
+    if starts_at.present? && Time.current < starts_at
+      Rails.logger.error "Coupon #{code} is not active yet"
+      return false
+    end
+    if ends_at.present? && Time.current > ends_at
+      Rails.logger.error "Coupon #{code} has expired"
+      return false
+    end
     if only_new_users? && user.present?
-      return false if Reservation.exists?(user_id: user.id)
+      if Reservation.exists?(user_id: user.id)
+        Rails.logger.error "Coupon #{code} is not valid for this user because they already have a reservation"
+        return false
+      end
     end
 
     if usage_limit.present? && times_used >= usage_limit
+      Rails.logger.error "Coupon #{code} has reached its usage limit"
       return false
     end
 
+    Rails.logger.info "Coupon #{code} is valid for user #{user.id}"
     true
   end
 

@@ -6,7 +6,7 @@ class Reservations::CreateWithPaymentService
     @coupon_code = coupon_code&.to_s&.strip
 
     @discount_amount = 0
-    @final_amount = 0
+    @final_amount = nil
     @coupon = nil
   end
 
@@ -21,6 +21,8 @@ class Reservations::CreateWithPaymentService
     @class_space = find_class_space(@class_session)
     return failure("El espacio de clase no fue encontrado") unless @class_space
     return failure("El espacio de clase no está disponible") unless @class_space.available?
+
+    return failure("Ya tienes una reserva para esta clase") if @user.reservations.by_class_session(@class_session_id).active.exists?
 
     return reserve_with_credit if available_credit?
 
@@ -136,7 +138,7 @@ class Reservations::CreateWithPaymentService
   end
 
   def create_payment_intent
-    amount_cents = @final_amount.to_i > 0 ? @final_amount.to_i : (@class_session.price.to_d * 100).to_i
+    amount_cents = @final_amount.presence || (@class_session.price.to_d * 100).to_i
     service = Payments::PaymentIntentService.new(
       user: @user,
       amount: amount_cents,

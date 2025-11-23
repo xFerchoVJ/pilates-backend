@@ -30,9 +30,6 @@ module Filters
         filtered = filtered.date_to(date) if date
       end
 
-      filtered = filtered.start_time_from(@params[:start_time_from]) if present?(:start_time_from)
-      filtered = filtered.start_time_to(@params[:start_time_to]) if present?(:start_time_to)
-
       filtered
     end
 

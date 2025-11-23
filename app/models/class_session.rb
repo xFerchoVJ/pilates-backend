@@ -31,8 +31,16 @@ class ClassSession < ApplicationRecord
   scope :by_lounge, ->(lounge_id) { where(lounge_id: lounge_id) }
   scope :start_time_from, ->(time) { where("start_time >= ?", parse_time(time)) }
   scope :start_time_to, ->(time) { where("start_time <= ?", parse_time(time)) }
-  scope :date_from, ->(date) { where("start_time >= ?", date.beginning_of_day) }
-  scope :date_to, ->(date) { where("start_time <= ?", date.end_of_day) }
+  scope :date_from, ->(date) {
+    parsed_date = parse_date(date)
+    return none unless parsed_date
+    where("start_time >= ?", parsed_date.beginning_of_day)
+  }
+  scope :date_to, ->(date) {
+    parsed_date = parse_date(date)
+    return none unless parsed_date
+    where("start_time <= ?", parsed_date.end_of_day)
+  }
   scope :upcoming, -> { where("end_time >= ?", Time.current) }
   scope :past, -> { where("end_time < ?", Time.current) }
   scope :price_min, ->(min) { where("price >= ?", min.to_i) }
@@ -53,6 +61,13 @@ class ClassSession < ApplicationRecord
 
   def self.parse_time(value)
     Time.parse(value)
+  rescue ArgumentError, TypeError
+    nil
+  end
+
+  def self.parse_date(value)
+    return value if value.is_a?(Date) || value.is_a?(Time) || value.is_a?(DateTime)
+    Date.parse(value.to_s)
   rescue ArgumentError, TypeError
     nil
   end
