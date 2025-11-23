@@ -135,7 +135,7 @@ class Api::V1::StripeWebhooksController < ApplicationController
       remaining_classes: class_package.unlimited? ? 0 : class_package.class_count,
       purchased_at: Time.current,
       status: "active",
-      expires_at: class_package.unlimited? ? Time.current + class_package.expires_in_days.days : nil
+      expires_at: class_package.expires_in_days.days.from_now
     )
   end
 end
