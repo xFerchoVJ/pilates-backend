@@ -50,7 +50,19 @@ services:
       - .:/app
     restart: unless-stopped
 
+  stripe:
+    image: stripe/stripe-cli:latest
+    command: ["listen", "--forward-to", "web:3000/api/v1/stripe_webhooks"]
+    env_file: .env
+    depends_on:
+      - web
+    volumes:
+      - stripe-cli-config:/root/.config/stripe
+    restart: unless-stopped
+
+
 volumes:
   postgres_pilates:
   redis_pilates:
   bundle_cache_pilates:
+  stripe-cli-config:

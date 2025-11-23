@@ -9,6 +9,7 @@ class User < ApplicationRecord
   has_many :devices, dependent: :destroy
   has_many :class_credits, dependent: :destroy
   has_many :class_waitlist_notifications, dependent: :destroy
+  has_many :coupon_usages, dependent: :destroy
 
   enum role: { user: 0, instructor: 1, admin: 2 }
 

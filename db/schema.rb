@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_11_22_215105) do
+ActiveRecord::Schema[7.2].define(version: 2025_11_23_193300) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -114,14 +114,12 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_22_215105) do
   create_table "coupon_usages", force: :cascade do |t|
     t.bigint "coupon_id", null: false
     t.bigint "user_id", null: false
-    t.bigint "reservation_id", null: false
     t.bigint "transaction_id", null: false
     t.jsonb "metadata"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["coupon_id", "user_id"], name: "index_coupon_usages_on_coupon_id_and_user_id"
     t.index ["coupon_id"], name: "index_coupon_usages_on_coupon_id"
-    t.index ["reservation_id"], name: "index_coupon_usages_on_reservation_id"
     t.index ["transaction_id"], name: "index_coupon_usages_on_transaction_id"
     t.index ["user_id"], name: "index_coupon_usages_on_user_id"
   end
@@ -250,6 +248,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_22_215105) do
     t.string "reset_password_token"
     t.datetime "reset_password_sent_at"
     t.string "has_injuries", default: "pending", null: false
+    t.boolean "is_new", default: true
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
@@ -263,7 +262,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_22_215105) do
   add_foreign_key "class_waitlist_notifications", "class_sessions"
   add_foreign_key "class_waitlist_notifications", "users"
   add_foreign_key "coupon_usages", "coupons"
-  add_foreign_key "coupon_usages", "reservations"
   add_foreign_key "coupon_usages", "transactions"
   add_foreign_key "coupon_usages", "users"
   add_foreign_key "devices", "users"

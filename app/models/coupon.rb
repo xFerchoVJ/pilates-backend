@@ -25,8 +25,8 @@ class Coupon < ApplicationRecord
       return false
     end
     if only_new_users? && user.present?
-      if Reservation.exists?(user_id: user.id)
-        Rails.logger.error "Coupon #{code} is not valid for this user because they already have a reservation"
+      if user.is_new == false
+        Rails.logger.error "Coupon #{code} is not valid for this user because they are not new"
         return false
       end
     end
@@ -34,6 +34,13 @@ class Coupon < ApplicationRecord
     if usage_limit.present? && times_used >= usage_limit
       Rails.logger.error "Coupon #{code} has reached its usage limit"
       return false
+    end
+
+    if usage_limit_per_user.present? && user.present?
+      if user.coupon_usages.where(coupon_id: id).count >= usage_limit_per_user
+        Rails.logger.error "Coupon #{code} has reached its usage limit for this user"
+        return false
+      end
     end
 
     Rails.logger.info "Coupon #{code} is valid for user #{user.id}"

@@ -1,9 +1,8 @@
 class Coupons::FinalizeUsageService
-  def initialize(coupon:, user:, transaction:, reservation: nil, metadata: {})
+  def initialize(coupon:, user:, transaction:, metadata: {})
     @coupon = coupon
     @user = user
     @transaction = transaction
-    @reservation = reservation
     @metadata = metadata
   end
 
@@ -19,7 +18,6 @@ class Coupons::FinalizeUsageService
       coupon: @coupon,
       user: @user,
       payment_transaction: @transaction,
-      reservation: @reservation,
       metadata: @metadata
     )
 

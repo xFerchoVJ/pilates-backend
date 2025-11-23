@@ -12,6 +12,7 @@ class Reservation < ApplicationRecord
   validate :class_space_must_exist
 
   before_create :mark_space_as_reserved
+  after_create :mark_is_new_to_user
   after_destroy :mark_space_as_available
   after_destroy :handle_credit_refund
 
@@ -85,5 +86,10 @@ class Reservation < ApplicationRecord
       reservation_id: id,
       status: "unused"
     )
+  end
+
+  def mark_is_new_to_user
+    return if user.is_new == false
+    user.update!(is_new: false)
   end
 end
