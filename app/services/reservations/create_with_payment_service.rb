@@ -70,7 +70,7 @@ class Reservations::CreateWithPaymentService
       @credit.update!(status: "used", used_at: Time.current)
       create_transaction!(
         type: Transaction.transaction_types[:class_credit_used],
-        reservation: reservation
+        reference: @credit
       )
       result = success(client_secret: nil)
     end
@@ -124,7 +124,7 @@ class Reservations::CreateWithPaymentService
       @package.consume_class! unless @package.class_package.unlimited?
       create_transaction!(
         type: Transaction.transaction_types[:class_redeemed],
-        reservation: reservation
+        reference: @package
       )
       result = success(client_secret: nil)
     end
@@ -181,16 +181,15 @@ class Reservations::CreateWithPaymentService
     raise
   end
 
-  def create_transaction!(type:, reservation:)
+  def create_transaction!(type:, reference:)
     Transaction.create!(
       user: @user,
       amount: 0,
       currency: "mxn",
       transaction_type: type,
-      reference_type: "Reservation",
-      reference: reservation,
+      reference: reference,
       status: :succeeded,
-      payment_intent_id: "#{@user.email}-#{reservation.id}-#{Time.current.to_i}"
+      payment_intent_id: "#{@user.email}-#{reference.id}-#{Time.current.to_i}"
     )
   end
 

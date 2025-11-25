@@ -2,7 +2,7 @@ class Reservation < ApplicationRecord
   belongs_to :user
   belongs_to :class_session
   belongs_to :class_space
-  has_many :class_credits, dependent: :destroy
+  has_many :class_credits, dependent: :nullify
 
   validates :user_id, uniqueness: { scope: :class_session_id, message: "ya tiene una reserva para esta clase" }
   validates :user_id, :class_session_id, :class_space_id, presence: true
@@ -14,7 +14,6 @@ class Reservation < ApplicationRecord
   before_create :mark_space_as_reserved
   after_create :mark_is_new_to_user
   after_destroy :mark_space_as_available
-  after_destroy :handle_credit_refund
 
   scope :by_user, ->(user_id) { where(user_id: user_id) }
   scope :by_class_session, ->(class_session_id) { where(class_session_id: class_session_id) }
@@ -71,21 +70,6 @@ class Reservation < ApplicationRecord
 
       entry.update!(notified_at: Time.current)
     end
-  end
-
-  def handle_credit_refund
-    # If the reservation was payed with package -> not create credit
-    last_tx = Transaction.find_by(reference: self)
-
-    return if last_tx.blank?
-    return if last_tx.transaction_type != "class_redeemed" # usando paquete
-    return if last_tx.amount == 0 # evitar falsos positivos
-
-    ClassCredit.create!(
-      user_id: user_id,
-      reservation_id: id,
-      status: "unused"
-    )
   end
 
   def mark_is_new_to_user

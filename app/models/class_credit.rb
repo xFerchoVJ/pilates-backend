@@ -1,6 +1,6 @@
 class ClassCredit < ApplicationRecord
   belongs_to :user
-  belongs_to :reservation
+  belongs_to :reservation, optional: true
 
   enum status: { unused: "unused", used: "used" }
 

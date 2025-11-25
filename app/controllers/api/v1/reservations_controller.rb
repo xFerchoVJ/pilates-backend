@@ -53,7 +53,12 @@ class Api::V1::ReservationsController < ApplicationController
   # DELETE /reservations/1
   def destroy
     authorize @reservation
-    @reservation.destroy!
+    service = Reservations::CancelService.new(reservation: @reservation)
+    service.call
+    render json: { message: "Reserva cancelada correctamente" }, status: :ok
+  rescue => e
+    Rails.logger.error "Error al cancelar reserva: #{e.message}"
+    render json: { error: "Error al cancelar la reserva" }, status: :unprocessable_entity
   end
 
   # POST /reservations/create_with_payment

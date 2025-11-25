@@ -6,7 +6,7 @@ default: &default
 
 development:
   <<: *default
-  url: "postgresql://postgres:supersecretpassword@localhost:5433/pilates_db"
+  url: <%= ENV['DATABASE_URL'] %>
 
 test:
   <<: *default

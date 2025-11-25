@@ -6,7 +6,7 @@ class Transaction < ApplicationRecord
   validates :amount, :currency, :status, :transaction_type, presence: true
 
 
-  validates :amount, numericality: { greater_than: 0 }, unless: -> { transaction_type == "class_redeemed" }
+  validates :amount, numericality: { greater_than: 0 }, unless: -> { transaction_type == "class_redeemed" || transaction_type == "class_credit_used" }
 
   enum status: {
     pending: "pending",
