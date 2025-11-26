@@ -5,9 +5,12 @@ class Reservations::CancelService
   end
 
   def call
+    Rails.logger.info("Cancelando reserva: #{@reservation.id}")
     Reservation.transaction do
       handle_refund_logic
+      Rails.logger.info("Reembolsando reserva: #{@reservation.id}")
       @reservation.destroy!
+      Rails.logger.info("Reserva cancelada: #{@reservation.id}")
     end
   end
 
