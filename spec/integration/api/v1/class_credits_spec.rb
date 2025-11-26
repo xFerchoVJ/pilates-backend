@@ -25,6 +25,34 @@ RSpec.describe 'Api::V1::ClassCredits', type: :request do
         run_test!
       end
     end
+
+    post('create class_credit') do
+      tags 'ClassCredits'
+      produces 'application/json'
+      consumes 'application/json'
+      security [ bearerAuth: [] ]
+      parameter name: :class_credit, in: :body, required: true, schema: {
+        type: :object,
+        properties: {
+          user_id: { type: :string },
+          reservation_id: { type: :string },
+          status: { type: :string, default: "unused" },
+          used_at: { type: :string }
+        },
+        required: %i[ user_id ]
+      }
+
+      response(200, 'successful') do
+        let(:class_credit) { create(:class_credit) }
+
+        after do |example|
+          example.metadata[:response][:content] = {
+            'application/json' => { example: JSON.parse(response.body, symbolize_names: true) }
+          }
+        end
+        run_test!
+      end
+    end
   end
 
   path '/api/v1/class_credits/{id}' do

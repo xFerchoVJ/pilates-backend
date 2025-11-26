@@ -3,14 +3,13 @@ default: &default
   encoding: unicode
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
 
-
 development:
   <<: *default
   url: <%= ENV['DATABASE_URL'] %>
 
 test:
   <<: *default
-  url: "postgresql://postgres:supersecretpassword@localhost:5433/pilates_db"
+  url: <%= ENV['DATABASE_URL'] %>
 
 production:
   <<: *default

@@ -5,12 +5,23 @@ require "rack/session" # 👈 agrega esta línea
 # Habilita sesiones solo para el panel de Sidekiq
 Sidekiq::Web.use Rack::Session::Cookie, secret: ENV.fetch("SIDEKIQ_SESSION_SECRET") { SecureRandom.hex(32) }
 
+# Autenticación compartida para Sidekiq y API Docs
+auth_proc = ->(username, password) {
+  user = User.find_by(email: username.downcase)
+  user&.authenticate(password) && user.admin?
+}
+
+Sidekiq::Web.use Rack::Auth::Basic, &auth_proc
+
 Rails.application.routes.draw do
-  mount Rswag::Ui::Engine => "/api-docs"
-  mount Rswag::Api::Engine => "/api-docs"
+  mount Rack::Auth::Basic.new(Rswag::Ui::Engine, &auth_proc) => "/api-docs"
+  mount Rack::Auth::Basic.new(Rswag::Api::Engine, &auth_proc) => "/api-docs"
 
   # Panel Sidekiq (requiere sesión para CSRF)
   mount Sidekiq::Web => "/sidekiq"
+
+  # Helper para cerrar sesión de Basic Auth (fuerza un 401)
+  get "/admin/logout", to: ->(env) { [ 401, { "WWW-Authenticate" => 'Basic realm="Application"' }, [ "Sesión cerrada. Cierra esta pestaña o recarga para volver a entrar." ] ] }
 
   get "up" => "rails/health#show", as: :rails_health_check
 
@@ -33,7 +44,7 @@ Rails.application.routes.draw do
         collection { post :purchase_with_payment }
       end
       resources :class_waitlist_notifications, only: [ :create, :destroy ]
-      resources :class_credits, only: [ :index, :show ]
+      resources :class_credits, only: [ :index, :show, :create ]
       resources :coupons do
         collection { post :validate }
       end

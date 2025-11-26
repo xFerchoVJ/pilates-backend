@@ -58,6 +58,34 @@ paths:
       responses:
         '200':
           description: successful
+    post:
+      summary: create class_credit
+      tags:
+      - ClassCredits
+      security:
+      - bearerAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: successful
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: string
+                reservation_id:
+                  type: string
+                status:
+                  type: string
+                  default: unused
+                used_at:
+                  type: string
+              required:
+              - user_id
+        required: true
   "/api/v1/class_credits/{id}":
     get:
       summary: show class_credit

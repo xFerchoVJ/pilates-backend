@@ -21,6 +21,16 @@ class Api::V1::ClassCreditsController < ApplicationController
     }
   end
 
+  def create
+    @class_credit = ClassCredit.new(class_credit_params)
+    authorize @class_credit
+    if @class_credit.save
+      render json: @class_credit, serializer: Api::V1::ClassCreditSerializer
+    else
+      render json: { errors: @class_credit.errors }, status: :unprocessable_entity
+    end
+  end
+
   def show
     authorize @class_credit
     render json: @class_credit, serializer: Api::V1::ClassCreditSerializer
@@ -28,6 +38,10 @@ class Api::V1::ClassCreditsController < ApplicationController
 end
 
 private
+
+def class_credit_params
+  params.require(:class_credit).permit(:user_id, :reservation_id, :status, :used_at)
+end
 
 def filter_params
   params.permit(:user_id, :reservation_id, :status, :used_from, :used_to)
