@@ -8,10 +8,10 @@
 :schedule:
   cleanup_expired_tokens:
     class: CleanupExpiredTokensJob
-    cron: '0 2 * * *' # Diariamente a las 2 AM
+    cron: "0 2 * * *" # Diariamente a las 2 AM
   cleanup_past_class_sessions:
     class: CleanupPastClassSessionsJob
-    cron: '0 * * * *' # Cada hora
+    cron: "*/15 * * * *" # Cada 15 minutos
   deactive_past_class_packages:
     class: DeactivePastClassPackagesJob
-    cron: '0 2 * * *' # Diariamente a las 2 AM
+    cron: "0 2 * * *" # Diariamente a las 2 AM

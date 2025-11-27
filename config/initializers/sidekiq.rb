@@ -37,7 +37,7 @@ else
 
   Sidekiq::Cron::Job.create(
     name: "Cleanup Past Class Sessions",
-    cron: "0 * * * *", # Ejecutar cada hora
+    cron: "*/15 * * * *", # Ejecutar cada 15 minutos
     class: "CleanupPastClassSessionsJob"
   )
 
