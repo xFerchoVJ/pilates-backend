@@ -11,8 +11,9 @@ class Reservation < ApplicationRecord
   validate :class_session_not_full
   validate :class_space_must_exist
 
-  before_create :mark_space_as_reserved
+  before_create :reserve_class_space
   after_create :mark_is_new_to_user
+  after_create_commit :send_confirmation_email
   after_destroy :mark_space_as_available
 
   scope :by_user, ->(user_id) { where(user_id: user_id) }
@@ -47,9 +48,12 @@ class Reservation < ApplicationRecord
     end
   end
 
-  def mark_space_as_reserved
+  def reserve_class_space
     return if class_space.nil?
     class_space.update!(status: :reserved)
+  end
+
+  def send_confirmation_email
     UserMailer.reservation_confirmation(self).deliver_later
   end
 
