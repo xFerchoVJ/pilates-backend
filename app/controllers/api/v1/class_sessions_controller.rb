@@ -5,7 +5,14 @@ class Api::V1::ClassSessionsController < ApplicationController
 
   # GET /class_sessions
   def index
-    @class_sessions = ClassSession.includes(:instructor, :reservations).order(:start_time)
+    # Define base scope based on user role
+    @class_sessions = if current_user.respond_to?(:admin?) && current_user.admin?
+                        ClassSession.all
+    else
+                        ClassSession.visible_to_customers
+    end
+
+    @class_sessions = @class_sessions.includes(:instructor, :reservations).order(:start_time)
 
     # Apply filters via service
     @class_sessions = ::Filters::ClassSessionsFilter.call(@class_sessions, filter_params)
@@ -53,7 +60,7 @@ class Api::V1::ClassSessionsController < ApplicationController
   # DELETE /class_sessions/1
   def destroy
     authorize @class_session
-    @class_session.destroy!
+    @class_session.soft_delete!
   end
 
   def create_recurring

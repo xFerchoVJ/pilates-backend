@@ -46,6 +46,16 @@ class ClassSession < ApplicationRecord
   scope :price_min, ->(min) { where("price >= ?", min.to_i) }
   scope :price_max, ->(max) { where("price <= ?", max.to_i) }
 
+  # Soft delete scopes
+  scope :active, -> { where(deleted_at: nil) }
+  scope :deleted, -> { where.not(deleted_at: nil) }
+  # Customers see only active classes that haven't finished (assuming 'upcoming' covers future end_time)
+  scope :visible_to_customers, -> { active.upcoming }
+
+  def soft_delete!
+    update!(deleted_at: Time.current)
+  end
+
   private
 
   def end_after_start

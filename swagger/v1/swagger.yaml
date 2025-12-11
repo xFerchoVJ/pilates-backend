@@ -1167,11 +1167,14 @@ paths:
                     description:
                       type: string
     delete:
-      summary: delete class_session
+      summary: delete class_session (Soft Delete)
       tags:
       - ClassSessions
       security:
       - bearerAuth: []
+      description: Soft deletes the class session. It will be retained for 8 days
+        before permanent deletion. Customers cannot see it immediately. Admins can
+        still access it during retention.
       responses:
         '204':
           description: no content

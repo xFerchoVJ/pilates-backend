@@ -212,9 +212,10 @@ RSpec.describe 'api/v1/class_sessions', type: :request do
       end
     end
 
-    delete('delete class_session') do
+    delete('delete class_session (Soft Delete)') do
       tags 'ClassSessions'
       security [ bearerAuth: [] ]
+      description "Soft deletes the class session. It will be retained for 8 days before permanent deletion. Customers cannot see it immediately. Admins can still access it during retention."
 
       response(204, 'no content') do
         let!(:lounge_design) { LoungeDesign.create!(name: 'Layout E', layout_json: { 'spaces' => [ { 'label' => 'E1', 'x' => 0, 'y' => 0 } ] }) }

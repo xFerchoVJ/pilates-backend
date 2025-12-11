@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_11_23_193300) do
+ActiveRecord::Schema[7.2].define(version: 2025_12_11_200000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -52,7 +52,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_23_193300) do
 
   create_table "class_credits", force: :cascade do |t|
     t.bigint "user_id", null: false
-    t.bigint "reservation_id", null: false
+    t.bigint "reservation_id"
     t.string "status", default: "unused"
     t.datetime "used_at"
     t.datetime "created_at", null: false
@@ -85,6 +85,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_23_193300) do
     t.datetime "updated_at", null: false
     t.bigint "lounge_id"
     t.integer "price"
+    t.datetime "deleted_at"
+    t.index ["deleted_at"], name: "index_class_sessions_on_deleted_at"
     t.index ["instructor_id"], name: "index_class_sessions_on_instructor_id"
     t.index ["lounge_id"], name: "index_class_sessions_on_lounge_id"
   end
