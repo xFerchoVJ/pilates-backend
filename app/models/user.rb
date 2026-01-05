@@ -34,8 +34,6 @@ class User < ApplicationRecord
     length: { minimum: 6, message: "La contraseña debe tener al menos 6 caracteres" },
     if: -> { new_record? || password.present? }
   validate :password_presence_if_local
-  validates :birthdate, presence: { message: "La fecha de nacimiento es requerida" }
-  validates :gender, presence: { message: "El género es requerido" }
   validates :name, presence: { message: "El nombre es requerido" }
   validates :last_name, presence: { message: "El apellido es requerido" }
   validates :phone, presence: { message: "El teléfono es requerido" }

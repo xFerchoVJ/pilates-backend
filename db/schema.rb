@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_12_11_200000) do
+ActiveRecord::Schema[7.2].define(version: 2026_01_05_175448) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -245,8 +245,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_12_11_200000) do
     t.boolean "google_email_verified"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "gender", null: false
-    t.date "birthdate", null: false
+    t.string "gender"
+    t.date "birthdate"
     t.string "reset_password_token"
     t.datetime "reset_password_sent_at"
     t.string "has_injuries", default: "pending", null: false
