@@ -27,15 +27,10 @@ Rails.application.configure do
   # Mailer
   config.action_mailer.raise_delivery_errors = true
   config.action_mailer.perform_caching = false
-  config.action_mailer.delivery_method = :smtp
-  config.action_mailer.smtp_settings = {
-  address:              "smtp-relay.brevo.com",
-  port:                 587,
-  user_name:            ENV["BREVO_USERNAME"], # suele ser tu email
-  password:             ENV["BREVO_SMTP_KEY"],
-  authentication:       "plain",
-  enable_starttls_auto: true
-}
+  config.action_mailer.delivery_method = :brevo
+  config.action_mailer.brevo_settings = {
+    api_key: ENV.fetch("BREVO_API_KEY")
+  }
 
   # Deprecation
   config.active_support.deprecation = :log
