@@ -67,7 +67,7 @@ class Reservations::CreateWithPaymentService
         raise ActiveRecord::Rollback
       end
 
-      @credit.update!(status: "used", used_at: Time.current)
+      @credit.update!(status: "used", used_at: Time.current,reservation: reservation)
       create_transaction!(
         type: Transaction.transaction_types[:class_credit_used],
         reference: @credit
