@@ -8,6 +8,8 @@ class User < ApplicationRecord
   has_many :transactions, dependent: :destroy
   has_many :devices, dependent: :destroy
   has_many :class_credits, dependent: :destroy
+  has_many :class_credit_adjustments, dependent: :destroy
+  has_many :admin_class_credit_adjustments, class_name: "ClassCreditAdjustment", foreign_key: :admin_user_id, dependent: :nullify
   has_many :class_waitlist_notifications, dependent: :destroy
   has_many :coupon_usages, dependent: :destroy
 

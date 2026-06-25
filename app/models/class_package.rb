@@ -5,6 +5,7 @@ class ClassPackage < ApplicationRecord
   validates :price, numericality: { greater_than: 0 }
 
   validates :class_count, numericality: { greater_than: 0 }, unless: :unlimited?
+  validates :expires_in_days, numericality: { only_integer: true, greater_than: 0 }, allow_nil: true
 
   validate :unlimited_must_have_expiration
 
@@ -29,7 +30,6 @@ class ClassPackage < ApplicationRecord
   scope :limited, -> { where(unlimited: false) }
 
   def unlimited_must_have_expiration
-    Rails.logger.info("unlimited? #{unlimited?}")
     if unlimited? && expires_in_days.blank?
       errors.add(:expires_in_days, "debe tener una fecha de expiración")
     end

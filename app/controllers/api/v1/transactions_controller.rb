@@ -34,7 +34,7 @@ end
 private
 
 def filter_params
-  params.permit(:user_id, :status, :transaction_type)
+  params.permit(:user_id, :status, :transaction_type, :sort, :direction)
 end
 
 def set_transaction

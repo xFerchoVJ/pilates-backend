@@ -1,5 +1,5 @@
 class Api::V1::ClassCreditSerializer < ActiveModel::Serializer
-  attributes :id, :user_id, :reservation_id, :status, :used_at, :user_email, :reservation_id
+  attributes :id, :user_id, :reservation_id, :status, :used_at, :expires_at, :user_email
 
   def user_email
     object.user.email

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_01_05_175448) do
+ActiveRecord::Schema[7.2].define(version: 2026_06_25_214000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -50,6 +50,20 @@ ActiveRecord::Schema[7.2].define(version: 2026_01_05_175448) do
     t.index ["jti"], name: "index_blacklisted_tokens_on_jti", unique: true
   end
 
+  create_table "class_credit_adjustments", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "admin_user_id"
+    t.integer "amount", null: false
+    t.text "reason", null: false
+    t.jsonb "credit_ids", default: [], null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["admin_user_id"], name: "index_class_credit_adjustments_on_admin_user_id"
+    t.index ["created_at"], name: "index_class_credit_adjustments_on_created_at"
+    t.index ["user_id"], name: "index_class_credit_adjustments_on_user_id"
+  end
+
   create_table "class_credits", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "reservation_id"
@@ -57,6 +71,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_01_05_175448) do
     t.datetime "used_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "expires_at"
+    t.index ["expires_at"], name: "index_class_credits_on_expires_at"
     t.index ["reservation_id"], name: "index_class_credits_on_reservation_id"
     t.index ["user_id"], name: "index_class_credits_on_user_id"
   end
@@ -256,6 +272,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_01_05_175448) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "class_credit_adjustments", "users"
+  add_foreign_key "class_credit_adjustments", "users", column: "admin_user_id"
   add_foreign_key "class_credits", "reservations"
   add_foreign_key "class_credits", "users"
   add_foreign_key "class_sessions", "lounges"

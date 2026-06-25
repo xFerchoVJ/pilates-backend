@@ -55,7 +55,11 @@ class Reservations::CreateWithPaymentService
   end
 
   def available_credit?
-    @credit ||= @user.class_credits.where(status: "unused").first
+    @credit ||= @user.class_credits
+                      .unused
+                      .not_expired
+                      .order(Arel.sql("expires_at ASC NULLS LAST"), :created_at)
+                      .first
   end
 
   def reserve_with_credit

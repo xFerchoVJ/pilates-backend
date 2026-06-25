@@ -37,6 +37,16 @@ Rails.application.routes.draw do
       post "cleanup_tokens", to: "auth#cleanup_tokens"
       post "stripe_webhooks", to: "stripe_webhooks#receive"
 
+      namespace :admin do
+        resources :users, only: [] do
+          resources :class_credit_adjustments, only: [ :create ]
+        end
+
+        resources :class_credits, only: [] do
+          member { post :void }
+        end
+      end
+
       resources :class_sessions do
         collection { post :create_recurring }
       end

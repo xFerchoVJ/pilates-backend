@@ -129,13 +129,16 @@ class Api::V1::StripeWebhooksController < ApplicationController
 
     return unless user && class_package.is_a?(ClassPackage)
 
+    purchased_at = Time.current
+    expires_at = class_package.expires_in_days.present? ? purchased_at + class_package.expires_in_days.days : nil
+
     UserClassPackage.create!(
       user: user,
       class_package: class_package,
       remaining_classes: class_package.unlimited? ? 0 : class_package.class_count,
-      purchased_at: Time.current,
+      purchased_at: purchased_at,
       status: "active",
-      expires_at: class_package.expires_in_days.days.from_now
+      expires_at: expires_at
     )
   end
 end
