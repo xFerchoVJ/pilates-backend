@@ -16,13 +16,14 @@ RSpec.describe "Api::V1::ClassPackages", type: :request do
     expect(ids).to include(class_package.id, inactive_class_package.id)
    end
 
-   it "allows user to see all class packages" do
+   it "allows user to see active class packages only" do
     inactive_class_package = create(:class_package, status: false)
     get '/api/v1/class_packages', headers: auth_headers_user, params: { per_page: 100 }
     expect(response).to have_http_status(:ok)
     data = JSON.parse(response.body)
     ids = data['class_packages'].map { |package| package['id'] }
-    expect(ids).to include(class_package.id, inactive_class_package.id)
+    expect(ids).to include(class_package.id)
+    expect(ids).not_to include(inactive_class_package.id)
    end
 
    it "allows non-authenticated users to see active class packages" do
@@ -140,6 +141,12 @@ RSpec.describe "Api::V1::ClassPackages", type: :request do
       expect(response).to have_http_status(:ok)
       data = JSON.parse(response.body)
       expect(data['id']).to eq(class_package.id)
+    end
+
+    it "does not expose inactive class packages to users" do
+      inactive_class_package = create(:class_package, status: false)
+      get "/api/v1/class_packages/#{inactive_class_package.id}", headers: auth_headers_user
+      expect(response).to have_http_status(:not_found)
     end
 
     it "allows non-authenticated users to see an active class package" do

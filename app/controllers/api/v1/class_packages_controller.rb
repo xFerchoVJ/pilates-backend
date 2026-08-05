@@ -75,7 +75,7 @@ class Api::V1::ClassPackagesController < ApplicationController
 
   private
     def class_packages_scope
-      @current_user ? ClassPackage.all : ClassPackage.active
+      @current_user&.admin? ? ClassPackage.all : ClassPackage.active
     end
 
     # Use callbacks to share common setup or constraints between actions.
