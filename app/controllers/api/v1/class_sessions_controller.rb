@@ -80,7 +80,7 @@ class Api::V1::ClassSessionsController < ApplicationController
       created: sessions.count,
       sessions: ActiveModelSerializers::SerializableResource.new(sessions, each_serializer: Api::V1::ClassSessionSerializer)
     }, status: :created
-  rescue ActiveRecord::RecordInvalid => e
+  rescue ActiveRecord::RecordInvalid, ArgumentError, TypeError => e
     render json: { error: e.message }, status: :unprocessable_entity
   end
 

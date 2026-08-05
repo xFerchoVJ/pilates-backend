@@ -108,8 +108,7 @@ paths:
       summary: list class_packages
       tags:
       - ClassPackages
-      security:
-      - bearerAuth: []
+      security: []
       parameters:
       - name: page
         in: query
@@ -210,8 +209,7 @@ paths:
       summary: show class_package
       tags:
       - ClassPackages
-      security:
-      - bearerAuth: []
+      security: []
       parameters:
       - name: id
         in: path
@@ -1037,6 +1035,59 @@ paths:
       responses:
         '200':
           description: successful
+  "/api/v1/public/class_sessions/schedule":
+    get:
+      summary: public class sessions schedule
+      tags:
+      - ClassSessions
+      security: []
+      responses:
+        '200':
+          description: successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  class_sessions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                        description:
+                          type: string
+                        start_time:
+                          type: string
+                          format: date-time
+                        end_time:
+                          type: string
+                          format: date-time
+                        price:
+                          type: integer
+                        spots_left:
+                          type: integer
+                        instructor:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                            name:
+                              type: string
+                            last_name:
+                              type: string
+                        lounge:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                            name:
+                              type: string
+                            description:
+                              type: string
   "/api/v1/class_sessions":
     get:
       summary: list class_sessions
@@ -1119,12 +1170,15 @@ paths:
                       type: integer
                     lounge_id:
                       type: integer
+                    price:
+                      type: integer
                   required:
                   - name
                   - start_time
                   - end_time
                   - instructor_id
                   - lounge_id
+                  - price
         required: true
   "/api/v1/class_sessions/{id}":
     parameters:

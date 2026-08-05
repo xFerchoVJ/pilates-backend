@@ -13,7 +13,73 @@ RSpec.describe 'api/v1/class_sessions', type: :request do
       birthdate: '1990-01-01'
     )
   end
+  let(:Authorization) { "Bearer #{JwtService.encode({ sub: admin.id, role: admin.role }, exp: JwtService.access_exp.from_now)}" }
+  let(:page) { nil }
+  let(:per_page) { nil }
+  let(:search) { nil }
+  let(:instructor_id) { nil }
+  let(:lounge_id) { nil }
+  let(:date_from) { nil }
+  let(:date_to) { nil }
+  let(:start_time_from) { nil }
+  let(:start_time_to) { nil }
 
+
+  path '/api/v1/public/class_sessions/schedule' do
+    get('public class sessions schedule') do
+      tags 'ClassSessions'
+      produces 'application/json'
+      security []
+
+      response(200, 'successful') do
+        let!(:included_session) do
+          create(
+            :class_session,
+            name: 'Clase publica',
+            description: 'Disponible para clientes',
+            start_time: 1.hour.from_now,
+            end_time: 2.hours.from_now
+          )
+        end
+        let!(:soft_deleted_session) do
+          create(
+            :class_session,
+            start_time: 2.days.from_now,
+            end_time: 2.days.from_now + 1.hour,
+            deleted_at: Time.current
+          )
+        end
+        let!(:past_session) do
+          create(
+            :class_session,
+            start_time: 2.days.ago,
+            end_time: 2.days.ago + 1.hour
+          )
+        end
+        let!(:far_session) do
+          create(
+            :class_session,
+            start_time: 15.days.from_now,
+            end_time: 15.days.from_now + 1.hour
+          )
+        end
+        run_test! do |response|
+          data = JSON.parse(response.body)
+          sessions = data['class_sessions']
+          ids = sessions.map { |class_session| class_session['id'] }
+          public_session = sessions.find { |class_session| class_session['id'] == included_session.id }
+
+          expect(ids).to include(included_session.id)
+          expect(ids).not_to include(soft_deleted_session.id, past_session.id, far_session.id)
+          expect(public_session.keys).to match_array(%w[id name description start_time end_time price spots_left instructor lounge])
+          expect(public_session['instructor'].keys).to match_array(%w[id name last_name])
+          expect(public_session['lounge'].keys).to match_array(%w[id name description])
+          expect(response.body).not_to include(included_session.instructor.email, included_session.instructor.phone)
+          expect(response.body).not_to include('users_for_class', 'users_count_for_class', 'class_spaces', 'reservations')
+        end
+      end
+    end
+  end
 
   path '/api/v1/class_sessions' do
     get('list class_sessions') do
@@ -45,8 +111,8 @@ RSpec.describe 'api/v1/class_sessions', type: :request do
             birthdate: '1990-01-01'
           )
         end
-        let!(:cs1) { ClassSession.create!(name: 'Clase 1', description: 'Desc 1', start_time: 1.day.from_now, end_time: 1.day.from_now + 1.hour, instructor: instructor, lounge: lounge) }
-        let!(:cs2) { ClassSession.create!(name: 'Clase 2', description: 'Desc 2', start_time: 2.days.from_now, end_time: 2.days.from_now + 1.hour, instructor: instructor, lounge: lounge) }
+        let!(:cs1) { ClassSession.create!(name: 'Clase 1', description: 'Desc 1', start_time: 1.day.from_now, end_time: 1.day.from_now + 1.hour, instructor: instructor, lounge: lounge, price: 100) }
+        let!(:cs2) { ClassSession.create!(name: 'Clase 2', description: 'Desc 2', start_time: 2.days.from_now, end_time: 2.days.from_now + 1.hour, instructor: instructor, lounge: lounge, price: 120) }
 
         after do |example|
           example.metadata[:response][:content] = {
@@ -76,9 +142,10 @@ RSpec.describe 'api/v1/class_sessions', type: :request do
               start_time: { type: :string, description: 'ISO8601 datetime' },
               end_time: { type: :string, description: 'ISO8601 datetime' },
               instructor_id: { type: :integer },
-              lounge_id: { type: :integer }
+              lounge_id: { type: :integer },
+              price: { type: :integer }
             },
-            required: %i[name start_time end_time instructor_id lounge_id]
+            required: %i[name start_time end_time instructor_id lounge_id price]
           }
         }
       }
@@ -107,7 +174,8 @@ RSpec.describe 'api/v1/class_sessions', type: :request do
               start_time: (Time.current + 3.days).iso8601,
               end_time: (Time.current + 3.days + 1.hour).iso8601,
               instructor_id: instructor.id,
-              lounge_id: lounge.id
+              lounge_id: lounge.id,
+              price: 150
             }
           }
         end
@@ -148,7 +216,7 @@ RSpec.describe 'api/v1/class_sessions', type: :request do
             birthdate: '1990-01-01'
           )
         end
-        let!(:record) { ClassSession.create!(name: 'Clase X', description: 'Detalle', start_time: 1.day.from_now, end_time: 1.day.from_now + 1.hour, instructor: instructor, lounge: lounge) }
+        let!(:record) { ClassSession.create!(name: 'Clase X', description: 'Detalle', start_time: 1.day.from_now, end_time: 1.day.from_now + 1.hour, instructor: instructor, lounge: lounge, price: 100) }
         let(:id) { record.id }
 
         after do |example|
@@ -196,7 +264,7 @@ RSpec.describe 'api/v1/class_sessions', type: :request do
             birthdate: '1990-01-01'
           )
         end
-        let!(:record) { ClassSession.create!(name: 'Clase Y', description: 'Detalle', start_time: 2.days.from_now, end_time: 2.days.from_now + 1.hour, instructor: instructor, lounge: lounge) }
+        let!(:record) { ClassSession.create!(name: 'Clase Y', description: 'Detalle', start_time: 2.days.from_now, end_time: 2.days.from_now + 1.hour, instructor: instructor, lounge: lounge, price: 100) }
         let(:id) { record.id }
         let(:class_session) { { description: 'Actualizada' } }
 
@@ -232,7 +300,7 @@ RSpec.describe 'api/v1/class_sessions', type: :request do
             birthdate: '1990-01-01'
           )
         end
-        let!(:record) { ClassSession.create!(name: 'Clase Z', description: 'Detalle', start_time: 3.days.from_now, end_time: 3.days.from_now + 1.hour, instructor: instructor, lounge: lounge) }
+        let!(:record) { ClassSession.create!(name: 'Clase Z', description: 'Detalle', start_time: 3.days.from_now, end_time: 3.days.from_now + 1.hour, instructor: instructor, lounge: lounge, price: 100) }
         let(:id) { record.id }
 
         run_test!
@@ -283,7 +351,25 @@ RSpec.describe 'api/v1/class_sessions', type: :request do
         let(:start_date) { (Date.today + 1.week).iso8601 }
         let(:end_date) { (Date.today + 1.month).iso8601 }
         let(:days_of_week) { [ 1, 3, 5 ] }
-        let(:class_session) { create(:class_session, instructor: instructor, lounge: lounge) }
+        let(:class_session) do
+          {
+            name: 'Yoga Matutino',
+            description: 'Clase recurrente de yoga',
+            start_time: '08:00',
+            end_time: '09:00',
+            instructor_id: instructor.id,
+            lounge_id: lounge.id,
+            price: 100
+          }
+        end
+        let(:params) do
+          {
+            start_date: start_date,
+            end_date: end_date,
+            days_of_week: days_of_week,
+            class_session: class_session
+          }
+        end
 
         after do |example|
           example.metadata[:response][:content] = {

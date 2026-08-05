@@ -1,10 +1,10 @@
 class ClassPackagePolicy < ApplicationPolicy
   def index?
-    user&.admin? || user&.user?
+    true
   end
 
   def show?
-    user&.admin? || user&.user?
+    true
   end
 
   def create?

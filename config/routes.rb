@@ -37,6 +37,10 @@ Rails.application.routes.draw do
       post "cleanup_tokens", to: "auth#cleanup_tokens"
       post "stripe_webhooks", to: "stripe_webhooks#receive"
 
+      namespace :public do
+        get "class_sessions/schedule", to: "class_sessions#schedule"
+      end
+
       namespace :admin do
         resources :users, only: [] do
           resources :class_credit_adjustments, only: [ :create ]

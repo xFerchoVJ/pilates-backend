@@ -5,7 +5,7 @@ RSpec.describe 'Api::V1::ClassPackages', type: :request do
     get('list class_packages') do
       tags 'ClassPackages'
       produces 'application/json'
-      security [ bearerAuth: [] ]
+      security []
 
       parameter name: :page, in: :query, schema: { type: :integer }
       parameter name: :per_page, in: :query, schema: { type: :integer }
@@ -66,7 +66,7 @@ RSpec.describe 'Api::V1::ClassPackages', type: :request do
     get('show class_package') do
       tags 'ClassPackages'
       produces 'application/json'
-      security [ bearerAuth: [] ]
+      security []
 
       parameter name: :id, in: :path, type: :string, description: 'class_package id'
 

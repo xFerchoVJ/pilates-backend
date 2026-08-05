@@ -1,10 +1,11 @@
 class Api::V1::ClassPackagesController < ApplicationController
   include Filterable
+  before_action :authenticate_user!, except: %i[ index show ]
   before_action :set_class_package, only: %i[ show update destroy ]
-  before_action :authenticate_user!
+
   # GET /api/v1/class_packages
   def index
-    @class_packages = ClassPackage.all
+    @class_packages = class_packages_scope
 
     # Apply filters via service
     @class_packages = ::Filters::ClassPackagesFilter.call(@class_packages, filter_params)
@@ -73,9 +74,13 @@ class Api::V1::ClassPackagesController < ApplicationController
   end
 
   private
+    def class_packages_scope
+      @current_user ? ClassPackage.all : ClassPackage.active
+    end
+
     # Use callbacks to share common setup or constraints between actions.
     def set_class_package
-      @class_package = ClassPackage.find(params[:id])
+      @class_package = class_packages_scope.find(params[:id])
     end
 
     def filter_params
