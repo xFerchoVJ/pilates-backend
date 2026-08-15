@@ -45,6 +45,7 @@ class Api::V1::UsersController < ApplicationController
   def update
     # Solo permitir que los usuarios actualicen su propio perfil o que los admins actualicen cualquier perfil
     authorize @user
+    return if restricted_admin_password_change?
 
     if @user.update(user_params)
       render json: @user, serializer: Api::V1::UsersSerializer
@@ -168,5 +169,21 @@ class Api::V1::UsersController < ApplicationController
     else
       params.permit(permitted_params)
     end
+  end
+
+  def password_param_present?
+    if params[:user]
+      params[:user][:password].present?
+    else
+      params[:password].present?
+    end
+  end
+
+  def restricted_admin_password_change?
+    return false unless password_param_present?
+    return false unless @current_user&.admin?
+
+    render json: { error: "Usa el endpoint administrativo de contrasenas" }, status: :forbidden
+    true
   end
 end

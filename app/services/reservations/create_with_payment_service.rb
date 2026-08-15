@@ -27,6 +27,7 @@ class Reservations::CreateWithPaymentService
     return reserve_with_credit if available_credit?
 
     return reserve_with_package if available_package?
+    return failure("Has alcanzado el límite diario de clases de tu membresía") if unlimited_daily_limit_exceeded?
 
     apply_coupon_result = apply_coupon_if_any
     return apply_coupon_result unless apply_coupon_result[:success]
@@ -108,12 +109,22 @@ class Reservations::CreateWithPaymentService
     daily_limit = @package.class_package.daily_limit
     return false unless daily_limit
 
-    today_reservations = @user.reservations
-                              .where(status: true)
-                              .where("DATE(created_at) = ?", Date.current)
-                              .count
+    reservations_for_class_day = @user.reservations
+                                      .active
+                                      .joins(:class_session)
+                                      .where(class_sessions: { start_time: @class_session.start_time.in_time_zone.all_day })
+                                      .count
 
-    today_reservations >= daily_limit
+    if reservations_for_class_day >= daily_limit
+      @unlimited_daily_limit_exceeded = true
+      return true
+    end
+
+    false
+  end
+
+  def unlimited_daily_limit_exceeded?
+    @unlimited_daily_limit_exceeded == true
   end
 
   def reserve_with_package

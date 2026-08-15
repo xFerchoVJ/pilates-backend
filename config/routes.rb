@@ -43,6 +43,8 @@ Rails.application.routes.draw do
 
       namespace :admin do
         resources :users, only: [] do
+          collection { get :birthdays }
+          member { patch :password }
           resources :class_credit_adjustments, only: [ :create ]
         end
 
