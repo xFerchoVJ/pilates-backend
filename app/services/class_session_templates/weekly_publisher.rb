@@ -120,7 +120,6 @@ module ClassSessionTemplates
 
     def existing_sessions(candidate)
       ClassSession.active
-                  .where.not(lifecycle_status: "canceled")
                   .where(
                     "lounge_id = :lounge_id OR instructor_id = :instructor_id",
                     lounge_id: candidate[:lounge_id], instructor_id: candidate[:instructor_id]

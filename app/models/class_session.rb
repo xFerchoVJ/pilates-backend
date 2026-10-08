@@ -13,12 +13,6 @@ class ClassSession < ApplicationRecord
 
   after_create :create_class_spaces
 
-  enum lifecycle_status: {
-    scheduled: "scheduled",
-    completed: "completed",
-    canceled: "canceled"
-  }, _prefix: :lifecycle
-
   def spots_left
     class_spaces.where(status: :available).count
   end
@@ -58,10 +52,9 @@ class ClassSession < ApplicationRecord
   scope :deleted, -> { where.not(deleted_at: nil) }
   # Customers see only active classes that haven't finished (assuming 'upcoming' covers future end_time)
   scope :visible_to_customers, -> { active.upcoming }
-  scope :history, -> { where(lifecycle_status: %w[completed canceled]) }
 
   def soft_delete!
-    update!(deleted_at: Time.current, lifecycle_status: :canceled)
+    update!(deleted_at: Time.current)
   end
 
   private
