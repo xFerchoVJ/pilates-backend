@@ -3,6 +3,7 @@ class ClassSession < ApplicationRecord
   has_many :reservations, dependent: :destroy
   has_many :class_spaces, dependent: :destroy
   belongs_to :lounge
+  belongs_to :class_session_template_publication, optional: true
 
   validates :name, :start_time, :end_time, :instructor_id, :lounge_id, :price, presence: true
   validates :price, numericality: { greater_than: 0 }
@@ -11,6 +12,12 @@ class ClassSession < ApplicationRecord
   validate :user_is_instructor
 
   after_create :create_class_spaces
+
+  enum lifecycle_status: {
+    scheduled: "scheduled",
+    completed: "completed",
+    canceled: "canceled"
+  }, _prefix: :lifecycle
 
   def spots_left
     class_spaces.where(status: :available).count
@@ -51,9 +58,10 @@ class ClassSession < ApplicationRecord
   scope :deleted, -> { where.not(deleted_at: nil) }
   # Customers see only active classes that haven't finished (assuming 'upcoming' covers future end_time)
   scope :visible_to_customers, -> { active.upcoming }
+  scope :history, -> { where(lifecycle_status: %w[completed canceled]) }
 
   def soft_delete!
-    update!(deleted_at: Time.current)
+    update!(deleted_at: Time.current, lifecycle_status: :canceled)
   end
 
   private

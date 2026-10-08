@@ -9,9 +9,171 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+  schemas:
+    ClassSessionTemplateItemInput:
+      type: object
+      required: [day_of_week, start_time, end_time, name, instructor_id, lounge_id, price]
+      properties:
+        day_of_week: { type: integer, minimum: 0, maximum: 6, description: '0 = Sunday, 1 = Monday, ..., 6 = Saturday' }
+        start_time: { type: string, example: '08:00' }
+        end_time: { type: string, example: '09:00' }
+        name: { type: string }
+        description: { type: string }
+        instructor_id: { type: integer }
+        lounge_id: { type: integer }
+        price: { type: integer, minimum: 1 }
+    TemplatePublicationInput:
+      type: object
+      required: [publication]
+      properties:
+        publication:
+          type: object
+          required: [week_start]
+          properties:
+            week_start: { type: string, format: date, description: Monday of the target week }
 security:
 - bearerAuth: []
 paths:
+  "/api/v1/class_session_templates":
+    get:
+      summary: list class session templates
+      tags:
+      - ClassSessionTemplates
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: successful
+    post:
+      summary: create class session template
+      tags:
+      - ClassSessionTemplates
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [class_session_template]
+              properties:
+                class_session_template:
+                  type: object
+                  required: [name, items]
+                  properties:
+                    name: { type: string }
+                    description: { type: string }
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/ClassSessionTemplateItemInput'
+      responses:
+        '201':
+          description: created
+  "/api/v1/class_session_templates/{id}":
+    get:
+      summary: show class session template
+      tags:
+      - ClassSessionTemplates
+      security:
+      - bearerAuth: []
+      parameters:
+      - { name: id, in: path, required: true, schema: { type: integer } }
+      responses:
+        '200':
+          description: successful
+    patch:
+      summary: update class session template
+      tags:
+      - ClassSessionTemplates
+      security:
+      - bearerAuth: []
+      parameters:
+      - { name: id, in: path, required: true, schema: { type: integer } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [class_session_template]
+              properties:
+                class_session_template:
+                  type: object
+                  properties:
+                    name: { type: string }
+                    description: { type: string }
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/ClassSessionTemplateItemInput'
+      responses:
+        '200':
+          description: successful
+  "/api/v1/class_session_templates/{id}/duplicate":
+    post:
+      summary: duplicate class session template
+      tags:
+      - ClassSessionTemplates
+      security:
+      - bearerAuth: []
+      parameters:
+      - { name: id, in: path, required: true, schema: { type: integer } }
+      responses:
+        '201':
+          description: created
+  "/api/v1/class_session_templates/{id}/archive":
+    patch:
+      summary: archive class session template
+      tags:
+      - ClassSessionTemplates
+      security:
+      - bearerAuth: []
+      parameters:
+      - { name: id, in: path, required: true, schema: { type: integer } }
+      responses:
+        '200':
+          description: successful
+  "/api/v1/class_session_templates/{id}/preview":
+    post:
+      summary: preview template publication
+      tags:
+      - ClassSessionTemplates
+      security:
+      - bearerAuth: []
+      parameters:
+      - { name: id, in: path, required: true, schema: { type: integer } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TemplatePublicationInput'
+      responses:
+        '200':
+          description: successful
+  "/api/v1/class_session_templates/{id}/publish":
+    post:
+      summary: publish template for a week
+      tags:
+      - ClassSessionTemplates
+      security:
+      - bearerAuth: []
+      parameters:
+      - { name: id, in: path, required: true, schema: { type: integer } }
+      - { name: Idempotency-Key, in: header, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TemplatePublicationInput'
+      responses:
+        '201':
+          description: created
+        '409':
+          description: conflict
   "/api/v1/class_credits":
     get:
       summary: list class_credits

@@ -56,6 +56,14 @@ Rails.application.routes.draw do
       resources :class_sessions do
         collection { post :create_recurring }
       end
+      resources :class_session_templates, only: [ :index, :show, :create, :update ] do
+        member do
+          post :duplicate
+          patch :archive
+          post :preview
+          post :publish
+        end
+      end
       resources :class_packages do
         collection { post :purchase_with_payment }
       end
